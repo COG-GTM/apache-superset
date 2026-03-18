@@ -36,6 +36,7 @@ from superset.db_engine_specs.base import (
     BasicParametersMixin,
     DatabaseCategory,
 )
+from superset.db_engine_specs.lib import validate_int_id, validate_sql_identifier
 from superset.errors import ErrorLevel, SupersetError, SupersetErrorType
 from superset.exceptions import SupersetException, SupersetSecurityException
 from superset.models.sql_lab import Query
@@ -641,7 +642,10 @@ class PostgresEngineSpec(BasicParametersMixin, PostgresBaseEngineSpec):
         be anything, and we would have to block users from running any queries
         referencing tables without an explicit schema.
         """
-        return [f'set search_path = "{schema}"'] if schema else []
+        if not schema:
+            return []
+        safe_schema = validate_sql_identifier(schema)
+        return [f'set search_path = "{safe_schema}"']
 
     @classmethod
     def get_allow_cost_estimate(cls, extra: dict[str, Any]) -> bool:
@@ -656,9 +660,9 @@ class PostgresEngineSpec(BasicParametersMixin, PostgresBaseEngineSpec):
         :param database: A Database object
         :param statement: A single SQL statement
         :param cursor: Cursor instance
-        :return: JSON response from Trino
+        :return: JSON response from Postgres
         """
-        sql = f"EXPLAIN {statement}"
+        sql = "EXPLAIN " + statement
         cursor.execute(sql)
 
         result = cursor.fetchone()[0]
@@ -769,10 +773,12 @@ WHERE datistemplate = false;
         :return: True if query cancelled successfully, False otherwise
         """
         try:
+            validated_id = validate_int_id(cancel_query_id)
             cursor.execute(
-                "SELECT pg_terminate_backend(pid) "  # noqa: S608
+                "SELECT pg_terminate_backend(pid) "
                 "FROM pg_stat_activity "
-                f"WHERE pid='{cancel_query_id}'"
+                "WHERE pid=%s",
+                (validated_id,),
             )
         except Exception:  # pylint: disable=broad-except
             return False

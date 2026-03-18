@@ -18,6 +18,7 @@
 from __future__ import annotations
 
 import os
+import re
 from typing import Any
 
 import yaml
@@ -25,6 +26,37 @@ import yaml
 from superset.constants import TimeGrain
 from superset.db_engine_specs import load_engine_specs
 from superset.db_engine_specs.base import BaseEngineSpec
+
+# Pattern for valid SQL identifiers (schemas, table names, etc.).
+# Allows alphanumeric, underscores, dots, hyphens, and dollar signs.
+_SQL_IDENTIFIER_RE = re.compile(r"^[A-Za-z0-9_.$-]+$")
+
+
+def validate_int_id(value: str | int) -> int:
+    """
+    Validate that a value intended for use as a numeric database ID
+    (e.g., a connection ID or PID) is actually an integer.
+
+    Raises ``ValueError`` if the value cannot be safely converted.
+    """
+    return int(value)
+
+
+def validate_sql_identifier(identifier: str) -> str:
+    """
+    Validate a SQL identifier (schema name, table name, etc.) to prevent
+    SQL injection through crafted identifiers.
+
+    Only allows alphanumeric characters, underscores, dots, hyphens,
+    and dollar signs.  Raises ``ValueError`` for anything else.
+    """
+    if not identifier or not _SQL_IDENTIFIER_RE.match(identifier):
+        raise ValueError(
+            f"Invalid SQL identifier: {identifier!r}. "
+            "Only alphanumeric characters, underscores, dots, hyphens, "
+            "and dollar signs are allowed."
+        )
+    return identifier
 
 LIMIT_METHODS = {
     "FORCE_LIMIT": (
