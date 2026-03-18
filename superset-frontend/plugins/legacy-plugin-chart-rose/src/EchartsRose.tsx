@@ -17,11 +17,14 @@
  * under the License.
  */
 import Echart from '@superset-ui/plugin-chart-echarts/src/components/Echart';
+import { allEventHandlers } from '@superset-ui/plugin-chart-echarts/src/utils/eventHandlers';
 import { RoseChartTransformedProps } from './types';
 
 export default function EchartsRose(props: RoseChartTransformedProps) {
   const { height, width, echartOptions, selectedValues, refs, formData } =
     props;
+
+  const eventHandlers = allEventHandlers(props);
 
   return (
     <Echart
@@ -29,6 +32,7 @@ export default function EchartsRose(props: RoseChartTransformedProps) {
       height={height}
       width={width}
       echartOptions={echartOptions}
+      eventHandlers={eventHandlers}
       selectedValues={selectedValues}
       vizType={formData.vizType}
     />

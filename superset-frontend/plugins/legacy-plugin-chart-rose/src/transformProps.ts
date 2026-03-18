@@ -23,6 +23,7 @@ import {
   getNumberFormatter,
   getTimeFormatter,
   NumberFormats,
+  SupersetTheme,
   ValueFormatter,
   DataRecord,
   tooltipHtml,
@@ -113,7 +114,7 @@ function getLegendProps(
   type: LegendType,
   orientation: LegendOrientation,
   show: boolean,
-  theme: Record<string, unknown>,
+  theme: SupersetTheme,
 ) {
   const legend: Record<string, unknown> = {
     orient: [LegendOrientation.Top, LegendOrientation.Bottom].includes(
@@ -125,10 +126,10 @@ function getLegendProps(
     type,
     selector: ['all', 'inverse'],
     selectorLabel: {
-      fontFamily: theme.fontFamily,
-      fontSize: theme.fontSizeSM,
-      color: theme.colorText,
-      borderColor: theme.colorBorder,
+      fontFamily: theme.typography?.families?.sansSerif,
+      fontSize: theme.typography?.sizes?.s,
+      color: theme.colors?.grayscale?.dark2,
+      borderColor: theme.colors?.grayscale?.light2,
     },
   };
 
@@ -319,7 +320,7 @@ export default function transformProps(
   const defaultLabel = {
     formatter,
     show: showLabels,
-    color: (theme as Record<string, unknown>).colorText as string,
+    color: (theme as SupersetTheme).colors?.grayscale?.dark2,
   };
 
   const chartPadding = getChartPadding(
@@ -353,8 +354,8 @@ export default function transformProps(
         label: {
           show: true,
           fontWeight: 'bold',
-          backgroundColor: (theme as Record<string, unknown>)
-            .colorBgContainer as string,
+          backgroundColor: (theme as SupersetTheme).colors?.grayscale
+            ?.light5 as string,
         },
       },
       data: transformedData,
@@ -391,7 +392,7 @@ export default function transformProps(
         legendType,
         legendOrientation,
         showLegend,
-        theme as Record<string, unknown>,
+        theme as SupersetTheme,
       ),
       data: transformedData
         .map(datum => datum.name as string)

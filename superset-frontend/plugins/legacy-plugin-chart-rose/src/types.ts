@@ -21,12 +21,17 @@ import {
   ChartProps,
   QueryFormColumn,
   QueryFormData,
-  SetDataMaskHook,
-  ContextMenuFilters,
-  FilterState,
 } from '@superset-ui/core';
-import type { EChartsCoreOption } from 'echarts/core';
-import { RefObject, Ref } from 'react';
+import {
+  BaseTransformedProps,
+  CrossFilterTransformedProps,
+  LegendOrientation,
+  LegendType,
+  Refs,
+} from '@superset-ui/plugin-chart-echarts';
+
+export { LegendOrientation, LegendType };
+export type { Refs };
 
 export type EchartsRoseFormData = QueryFormData & {
   colorScheme?: string;
@@ -60,52 +65,13 @@ export enum EchartsRoseLabelType {
   KeyValuePercent = 'key_value_percent',
 }
 
-export enum LegendOrientation {
-  Top = 'top',
-  Bottom = 'bottom',
-  Left = 'left',
-  Right = 'right',
-}
-
-export enum LegendType {
-  Scroll = 'scroll',
-  Plain = 'plain',
-}
-
 export interface EchartsRoseChartProps extends ChartProps<EchartsRoseFormData> {
   formData: EchartsRoseFormData;
   queriesData: ChartDataResponseResult[];
 }
 
-export interface EchartsHandler {
-  getEchartInstance: () => unknown;
-}
-
-export type Refs = {
-  echartRef?: Ref<EchartsHandler>;
-  divRef?: RefObject<HTMLDivElement>;
-};
-
-export type EventHandlers = Record<string, { (props: unknown): void }>;
-
-export interface RoseChartTransformedProps {
-  echartOptions: EChartsCoreOption;
-  formData: EchartsRoseFormData;
-  height: number;
-  width: number;
-  setDataMask?: SetDataMaskHook;
-  labelMap: Record<string, string[]>;
-  groupby: QueryFormColumn[];
-  selectedValues: Record<number, string>;
-  onContextMenu?: (
-    clientX: number,
-    clientY: number,
-    filters?: ContextMenuFilters,
-  ) => void;
-  refs: Refs;
-  emitCrossFilters?: boolean;
-  coltypeMapping?: Record<string, number>;
-}
+export type RoseChartTransformedProps = BaseTransformedProps<EchartsRoseFormData> &
+  CrossFilterTransformedProps;
 
 // @ts-expect-error - partial form data for defaults
 export const DEFAULT_FORM_DATA: EchartsRoseFormData = {
