@@ -55,254 +55,228 @@ function getControl(
   return item;
 }
 
-describe('controlPanel', () => {
-  describe('sections', () => {
-    test('has three control panel sections', () => {
-      expect(controlPanel.controlPanelSections).toHaveLength(3);
-    });
+test('controlPanel has three control panel sections', () => {
+  expect(controlPanel.controlPanelSections).toHaveLength(3);
+});
 
-    test('first section is Time', () => {
-      const section = controlPanel.controlPanelSections![0];
-      expect(section.label).toBeDefined();
-      expect(section.expanded).toBe(true);
-    });
+test('controlPanel first section is Time', () => {
+  const section = controlPanel.controlPanelSections![0];
+  expect(section.label).toBeDefined();
+  expect(section.expanded).toBe(true);
+});
 
-    test('second section is Query', () => {
-      const section = controlPanel.controlPanelSections![1];
-      expect(section.label).toBeDefined();
-      expect(section.expanded).toBe(true);
-    });
+test('controlPanel second section is Query', () => {
+  const section = controlPanel.controlPanelSections![1];
+  expect(section.label).toBeDefined();
+  expect(section.expanded).toBe(true);
+});
 
-    test('third section is Chart Options', () => {
-      const section = controlPanel.controlPanelSections![2];
-      expect(section.label).toBeDefined();
-      expect(section.expanded).toBe(true);
-      expect(section.tabOverride).toBe('customize');
-    });
+test('controlPanel third section is Chart Options', () => {
+  const section = controlPanel.controlPanelSections![2];
+  expect(section.label).toBeDefined();
+  expect(section.expanded).toBe(true);
+  expect(section.tabOverride).toBe('customize');
+});
 
-    test('Time section has granularity_sqla and time_range controls', () => {
-      const section = controlPanel.controlPanelSections![0];
-      const controlNames = section.controlSetRows!.flat();
-      expect(controlNames).toContain('granularity_sqla');
-      expect(controlNames).toContain('time_range');
-    });
+test('controlPanel Time section has granularity_sqla and time_range controls', () => {
+  const section = controlPanel.controlPanelSections![0];
+  const controlNames = section.controlSetRows!.flat();
+  expect(controlNames).toContain('granularity_sqla');
+  expect(controlNames).toContain('time_range');
+});
 
-    test('Query section has metrics and adhoc_filters', () => {
-      const section = controlPanel.controlPanelSections![1];
-      const flatRows = section.controlSetRows!.flat();
-      expect(flatRows).toContain('metrics');
-      expect(flatRows).toContain('adhoc_filters');
-    });
-  });
+test('controlPanel Query section has metrics and adhoc_filters', () => {
+  const section = controlPanel.controlPanelSections![1];
+  const flatRows = section.controlSetRows!.flat();
+  expect(flatRows).toContain('metrics');
+  expect(flatRows).toContain('adhoc_filters');
+});
 
-  describe('domain_granularity control', () => {
-    test('has correct default value', () => {
-      const control = getControl(controlPanel, 'domain_granularity');
-      expect(control.config.default).toBe('month');
-    });
+test('controlPanel domain_granularity has correct default value', () => {
+  const control = getControl(controlPanel, 'domain_granularity');
+  expect(control.config.default).toBe('month');
+});
 
-    test('is a SelectControl', () => {
-      const control = getControl(controlPanel, 'domain_granularity');
-      expect(control.config.type).toBe('SelectControl');
-    });
+test('controlPanel domain_granularity is a SelectControl', () => {
+  const control = getControl(controlPanel, 'domain_granularity');
+  expect(control.config.type).toBe('SelectControl');
+});
 
-    test('has five choices', () => {
-      const control = getControl(controlPanel, 'domain_granularity');
-      expect(control.config.choices).toHaveLength(5);
-    });
+test('controlPanel domain_granularity has five choices', () => {
+  const control = getControl(controlPanel, 'domain_granularity');
+  expect(control.config.choices).toHaveLength(5);
+});
 
-    test('choices include hour, day, week, month, year', () => {
-      const control = getControl(controlPanel, 'domain_granularity');
-      const choiceValues = (control.config.choices as [string, string][]).map(
-        c => c[0],
-      );
-      expect(choiceValues).toEqual(['hour', 'day', 'week', 'month', 'year']);
-    });
-  });
+test('controlPanel domain_granularity choices include hour, day, week, month, year', () => {
+  const control = getControl(controlPanel, 'domain_granularity');
+  const choiceValues = (control.config.choices as [string, string][]).map(
+    c => c[0],
+  );
+  expect(choiceValues).toEqual(['hour', 'day', 'week', 'month', 'year']);
+});
 
-  describe('subdomain_granularity control', () => {
-    test('has correct default value', () => {
-      const control = getControl(controlPanel, 'subdomain_granularity');
-      expect(control.config.default).toBe('day');
-    });
+test('controlPanel subdomain_granularity has correct default value', () => {
+  const control = getControl(controlPanel, 'subdomain_granularity');
+  expect(control.config.default).toBe('day');
+});
 
-    test('is a SelectControl', () => {
-      const control = getControl(controlPanel, 'subdomain_granularity');
-      expect(control.config.type).toBe('SelectControl');
-    });
+test('controlPanel subdomain_granularity is a SelectControl', () => {
+  const control = getControl(controlPanel, 'subdomain_granularity');
+  expect(control.config.type).toBe('SelectControl');
+});
 
-    test('has five choices', () => {
-      const control = getControl(controlPanel, 'subdomain_granularity');
-      expect(control.config.choices).toHaveLength(5);
-    });
+test('controlPanel subdomain_granularity has five choices', () => {
+  const control = getControl(controlPanel, 'subdomain_granularity');
+  expect(control.config.choices).toHaveLength(5);
+});
 
-    test('choices include min, hour, day, week, month', () => {
-      const control = getControl(controlPanel, 'subdomain_granularity');
-      const choiceValues = (control.config.choices as [string, string][]).map(
-        c => c[0],
-      );
-      expect(choiceValues).toEqual(['min', 'hour', 'day', 'week', 'month']);
-    });
-  });
+test('controlPanel subdomain_granularity choices include min, hour, day, week, month', () => {
+  const control = getControl(controlPanel, 'subdomain_granularity');
+  const choiceValues = (control.config.choices as [string, string][]).map(
+    c => c[0],
+  );
+  expect(choiceValues).toEqual(['min', 'hour', 'day', 'week', 'month']);
+});
 
-  describe('cell_size control', () => {
-    test('has correct default value', () => {
-      const control = getControl(controlPanel, 'cell_size');
-      expect(control.config.default).toBe(10);
-    });
+test('controlPanel cell_size has correct default value', () => {
+  const control = getControl(controlPanel, 'cell_size');
+  expect(control.config.default).toBe(10);
+});
 
-    test('is a TextControl', () => {
-      const control = getControl(controlPanel, 'cell_size');
-      expect(control.config.type).toBe('TextControl');
-    });
+test('controlPanel cell_size is a TextControl', () => {
+  const control = getControl(controlPanel, 'cell_size');
+  expect(control.config.type).toBe('TextControl');
+});
 
-    test('is marked as integer', () => {
-      const control = getControl(controlPanel, 'cell_size');
-      expect(control.config.isInt).toBe(true);
-    });
+test('controlPanel cell_size is marked as integer', () => {
+  const control = getControl(controlPanel, 'cell_size');
+  expect(control.config.isInt).toBe(true);
+});
 
-    test('has renderTrigger enabled', () => {
-      const control = getControl(controlPanel, 'cell_size');
-      expect(control.config.renderTrigger).toBe(true);
-    });
+test('controlPanel cell_size has renderTrigger enabled', () => {
+  const control = getControl(controlPanel, 'cell_size');
+  expect(control.config.renderTrigger).toBe(true);
+});
 
-    test('has validators', () => {
-      const control = getControl(controlPanel, 'cell_size');
-      expect(control.config.validators).toHaveLength(1);
-    });
-  });
+test('controlPanel cell_size has validators', () => {
+  const control = getControl(controlPanel, 'cell_size');
+  expect(control.config.validators).toHaveLength(1);
+});
 
-  describe('cell_padding control', () => {
-    test('has correct default value', () => {
-      const control = getControl(controlPanel, 'cell_padding');
-      expect(control.config.default).toBe(2);
-    });
+test('controlPanel cell_padding has correct default value', () => {
+  const control = getControl(controlPanel, 'cell_padding');
+  expect(control.config.default).toBe(2);
+});
 
-    test('is a TextControl with integer validation', () => {
-      const control = getControl(controlPanel, 'cell_padding');
-      expect(control.config.type).toBe('TextControl');
-      expect(control.config.isInt).toBe(true);
-    });
+test('controlPanel cell_padding is a TextControl with integer validation', () => {
+  const control = getControl(controlPanel, 'cell_padding');
+  expect(control.config.type).toBe('TextControl');
+  expect(control.config.isInt).toBe(true);
+});
 
-    test('has renderTrigger enabled', () => {
-      const control = getControl(controlPanel, 'cell_padding');
-      expect(control.config.renderTrigger).toBe(true);
-    });
-  });
+test('controlPanel cell_padding has renderTrigger enabled', () => {
+  const control = getControl(controlPanel, 'cell_padding');
+  expect(control.config.renderTrigger).toBe(true);
+});
 
-  describe('cell_radius control', () => {
-    test('has correct default value', () => {
-      const control = getControl(controlPanel, 'cell_radius');
-      expect(control.config.default).toBe(0);
-    });
+test('controlPanel cell_radius has correct default value', () => {
+  const control = getControl(controlPanel, 'cell_radius');
+  expect(control.config.default).toBe(0);
+});
 
-    test('is a TextControl with integer validation', () => {
-      const control = getControl(controlPanel, 'cell_radius');
-      expect(control.config.type).toBe('TextControl');
-      expect(control.config.isInt).toBe(true);
-    });
-  });
+test('controlPanel cell_radius is a TextControl with integer validation', () => {
+  const control = getControl(controlPanel, 'cell_radius');
+  expect(control.config.type).toBe('TextControl');
+  expect(control.config.isInt).toBe(true);
+});
 
-  describe('steps control', () => {
-    test('has correct default value', () => {
-      const control = getControl(controlPanel, 'steps');
-      expect(control.config.default).toBe(10);
-    });
+test('controlPanel steps has correct default value', () => {
+  const control = getControl(controlPanel, 'steps');
+  expect(control.config.default).toBe(10);
+});
 
-    test('is a TextControl with integer validation', () => {
-      const control = getControl(controlPanel, 'steps');
-      expect(control.config.type).toBe('TextControl');
-      expect(control.config.isInt).toBe(true);
-    });
+test('controlPanel steps is a TextControl with integer validation', () => {
+  const control = getControl(controlPanel, 'steps');
+  expect(control.config.type).toBe('TextControl');
+  expect(control.config.isInt).toBe(true);
+});
 
-    test('has renderTrigger enabled', () => {
-      const control = getControl(controlPanel, 'steps');
-      expect(control.config.renderTrigger).toBe(true);
-    });
-  });
+test('controlPanel steps has renderTrigger enabled', () => {
+  const control = getControl(controlPanel, 'steps');
+  expect(control.config.renderTrigger).toBe(true);
+});
 
-  describe('x_axis_time_format control', () => {
-    test('has correct default value', () => {
-      const control = getControl(controlPanel, 'x_axis_time_format');
-      expect(control.config.default).toBe('smart_date');
-    });
+test('controlPanel x_axis_time_format has correct default value', () => {
+  const control = getControl(controlPanel, 'x_axis_time_format');
+  expect(control.config.default).toBe('smart_date');
+});
 
-    test('is a SelectControl with freeForm', () => {
-      const control = getControl(controlPanel, 'x_axis_time_format');
-      expect(control.config.type).toBe('SelectControl');
-      expect(control.config.freeForm).toBe(true);
-    });
+test('controlPanel x_axis_time_format is a SelectControl with freeForm', () => {
+  const control = getControl(controlPanel, 'x_axis_time_format');
+  expect(control.config.type).toBe('SelectControl');
+  expect(control.config.freeForm).toBe(true);
+});
 
-    test('has renderTrigger enabled', () => {
-      const control = getControl(controlPanel, 'x_axis_time_format');
-      expect(control.config.renderTrigger).toBe(true);
-    });
-  });
+test('controlPanel x_axis_time_format has renderTrigger enabled', () => {
+  const control = getControl(controlPanel, 'x_axis_time_format');
+  expect(control.config.renderTrigger).toBe(true);
+});
 
-  describe('show_legend control', () => {
-    test('has correct default value', () => {
-      const control = getControl(controlPanel, 'show_legend');
-      expect(control.config.default).toBe(true);
-    });
+test('controlPanel show_legend has correct default value', () => {
+  const control = getControl(controlPanel, 'show_legend');
+  expect(control.config.default).toBe(true);
+});
 
-    test('is a CheckboxControl', () => {
-      const control = getControl(controlPanel, 'show_legend');
-      expect(control.config.type).toBe('CheckboxControl');
-    });
+test('controlPanel show_legend is a CheckboxControl', () => {
+  const control = getControl(controlPanel, 'show_legend');
+  expect(control.config.type).toBe('CheckboxControl');
+});
 
-    test('has renderTrigger enabled', () => {
-      const control = getControl(controlPanel, 'show_legend');
-      expect(control.config.renderTrigger).toBe(true);
-    });
-  });
+test('controlPanel show_legend has renderTrigger enabled', () => {
+  const control = getControl(controlPanel, 'show_legend');
+  expect(control.config.renderTrigger).toBe(true);
+});
 
-  describe('show_values control', () => {
-    test('has correct default value', () => {
-      const control = getControl(controlPanel, 'show_values');
-      expect(control.config.default).toBe(false);
-    });
+test('controlPanel show_values has correct default value', () => {
+  const control = getControl(controlPanel, 'show_values');
+  expect(control.config.default).toBe(false);
+});
 
-    test('is a CheckboxControl', () => {
-      const control = getControl(controlPanel, 'show_values');
-      expect(control.config.type).toBe('CheckboxControl');
-    });
-  });
+test('controlPanel show_values is a CheckboxControl', () => {
+  const control = getControl(controlPanel, 'show_values');
+  expect(control.config.type).toBe('CheckboxControl');
+});
 
-  describe('show_metric_name control', () => {
-    test('has correct default value', () => {
-      const control = getControl(controlPanel, 'show_metric_name');
-      expect(control.config.default).toBe(true);
-    });
+test('controlPanel show_metric_name has correct default value', () => {
+  const control = getControl(controlPanel, 'show_metric_name');
+  expect(control.config.default).toBe(true);
+});
 
-    test('is a CheckboxControl', () => {
-      const control = getControl(controlPanel, 'show_metric_name');
-      expect(control.config.type).toBe('CheckboxControl');
-    });
-  });
+test('controlPanel show_metric_name is a CheckboxControl', () => {
+  const control = getControl(controlPanel, 'show_metric_name');
+  expect(control.config.type).toBe('CheckboxControl');
+});
 
-  describe('controlOverrides', () => {
-    test('overrides y_axis_format label', () => {
-      expect(controlPanel.controlOverrides).toBeDefined();
-      expect(controlPanel.controlOverrides!.y_axis_format).toBeDefined();
-      expect(controlPanel.controlOverrides!.y_axis_format.label).toBeDefined();
-    });
-  });
+test('controlPanel controlOverrides overrides y_axis_format label', () => {
+  expect(controlPanel.controlOverrides).toBeDefined();
+  expect(controlPanel.controlOverrides!.y_axis_format).toBeDefined();
+  expect(controlPanel.controlOverrides!.y_axis_format.label).toBeDefined();
+});
 
-  describe('formDataOverrides', () => {
-    test('is defined', () => {
-      expect(controlPanel.formDataOverrides).toBeDefined();
-      expect(typeof controlPanel.formDataOverrides).toBe('function');
-    });
+test('controlPanel formDataOverrides is defined', () => {
+  expect(controlPanel.formDataOverrides).toBeDefined();
+  expect(typeof controlPanel.formDataOverrides).toBe('function');
+});
 
-    test('spreads formData and adds metrics', () => {
-      const mockFormData = {
-        cellSize: 10,
-        showLegend: true,
-      };
-      const result = controlPanel.formDataOverrides!(mockFormData as any);
-      expect(result.cellSize).toBe(10);
-      expect(result.showLegend).toBe(true);
-      expect('metrics' in result).toBe(true);
-    });
-  });
+test('controlPanel formDataOverrides spreads formData and adds metrics', () => {
+  const mockFormData = {
+    cellSize: 10,
+    showLegend: true,
+  };
+  const result = controlPanel.formDataOverrides!(
+    mockFormData as Record<string, unknown>,
+  );
+  expect(result.cellSize).toBe(10);
+  expect(result.showLegend).toBe(true);
+  expect('metrics' in result).toBe(true);
 });

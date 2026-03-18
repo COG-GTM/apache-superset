@@ -68,141 +68,139 @@ function createChartProps(overrides: Record<string, unknown> = {}) {
   });
 }
 
-describe('transformProps', () => {
-  test('extracts height from chartProps', () => {
-    const result = transformProps(createChartProps());
-    expect(result.height).toBe(600);
-  });
+test('transformProps extracts height from chartProps', () => {
+  const result = transformProps(createChartProps());
+  expect(result.height).toBe(600);
+});
 
-  test('extracts data from queriesData', () => {
-    const result = transformProps(createChartProps());
-    expect(result.data).toEqual(baseQueriesData[0].data);
-  });
+test('transformProps extracts data from queriesData', () => {
+  const result = transformProps(createChartProps());
+  expect(result.data).toEqual(baseQueriesData[0].data);
+});
 
-  test('extracts cellPadding from formData', () => {
-    const result = transformProps(createChartProps({ cellPadding: 5 }));
-    expect(result.cellPadding).toBe(5);
-  });
+test('transformProps extracts cellPadding from formData', () => {
+  const result = transformProps(createChartProps({ cellPadding: 5 }));
+  expect(result.cellPadding).toBe(5);
+});
 
-  test('extracts cellRadius from formData', () => {
-    const result = transformProps(createChartProps({ cellRadius: 2 }));
-    expect(result.cellRadius).toBe(2);
-  });
+test('transformProps extracts cellRadius from formData', () => {
+  const result = transformProps(createChartProps({ cellRadius: 2 }));
+  expect(result.cellRadius).toBe(2);
+});
 
-  test('extracts cellSize from formData', () => {
-    const result = transformProps(createChartProps({ cellSize: 15 }));
-    expect(result.cellSize).toBe(15);
-  });
+test('transformProps extracts cellSize from formData', () => {
+  const result = transformProps(createChartProps({ cellSize: 15 }));
+  expect(result.cellSize).toBe(15);
+});
 
-  test('extracts domainGranularity from formData', () => {
-    const result = transformProps(
-      createChartProps({ domainGranularity: 'year' }),
-    );
-    expect(result.domainGranularity).toBe('year');
-  });
+test('transformProps extracts domainGranularity from formData', () => {
+  const result = transformProps(
+    createChartProps({ domainGranularity: 'year' }),
+  );
+  expect(result.domainGranularity).toBe('year');
+});
 
-  test('extracts linearColorScheme from formData', () => {
-    const result = transformProps(
-      createChartProps({ linearColorScheme: 'schemeBlues' }),
-    );
-    expect(result.linearColorScheme).toBe('schemeBlues');
-  });
+test('transformProps extracts linearColorScheme from formData', () => {
+  const result = transformProps(
+    createChartProps({ linearColorScheme: 'schemeBlues' }),
+  );
+  expect(result.linearColorScheme).toBe('schemeBlues');
+});
 
-  test('extracts showLegend from formData', () => {
-    const result = transformProps(createChartProps({ showLegend: false }));
-    expect(result.showLegend).toBe(false);
-  });
+test('transformProps extracts showLegend from formData', () => {
+  const result = transformProps(createChartProps({ showLegend: false }));
+  expect(result.showLegend).toBe(false);
+});
 
-  test('extracts showMetricName from formData', () => {
-    const result = transformProps(createChartProps({ showMetricName: false }));
-    expect(result.showMetricName).toBe(false);
-  });
+test('transformProps extracts showMetricName from formData', () => {
+  const result = transformProps(createChartProps({ showMetricName: false }));
+  expect(result.showMetricName).toBe(false);
+});
 
-  test('extracts showValues from formData', () => {
-    const result = transformProps(createChartProps({ showValues: true }));
-    expect(result.showValues).toBe(true);
-  });
+test('transformProps extracts showValues from formData', () => {
+  const result = transformProps(createChartProps({ showValues: true }));
+  expect(result.showValues).toBe(true);
+});
 
-  test('extracts steps from formData', () => {
-    const result = transformProps(createChartProps({ steps: 5 }));
-    expect(result.steps).toBe(5);
-  });
+test('transformProps extracts steps from formData', () => {
+  const result = transformProps(createChartProps({ steps: 5 }));
+  expect(result.steps).toBe(5);
+});
 
-  test('extracts subdomainGranularity from formData', () => {
-    const result = transformProps(
-      createChartProps({ subdomainGranularity: 'hour' }),
-    );
-    expect(result.subdomainGranularity).toBe('hour');
-  });
+test('transformProps extracts subdomainGranularity from formData', () => {
+  const result = transformProps(
+    createChartProps({ subdomainGranularity: 'hour' }),
+  );
+  expect(result.subdomainGranularity).toBe('hour');
+});
 
-  test('extracts verboseMap from datasource', () => {
-    const result = transformProps(createChartProps());
-    expect(result.verboseMap).toEqual({ count: 'Count' });
-  });
+test('transformProps extracts verboseMap from datasource', () => {
+  const result = transformProps(createChartProps());
+  expect(result.verboseMap).toEqual({ count: 'Count' });
+});
 
-  test('creates a timeFormatter function', () => {
-    const result = transformProps(createChartProps());
-    expect(typeof result.timeFormatter).toBe('function');
-  });
+test('transformProps creates a timeFormatter function', () => {
+  const result = transformProps(createChartProps());
+  expect(typeof result.timeFormatter).toBe('function');
+});
 
-  test('timeFormatter formats timestamps', () => {
-    const result = transformProps(
-      createChartProps({ xAxisTimeFormat: '%Y-%m-%d' }),
-    );
-    const formatted = result.timeFormatter(1704067200000);
-    expect(typeof formatted).toBe('string');
-    expect(formatted.length).toBeGreaterThan(0);
-  });
+test('transformProps timeFormatter formats timestamps', () => {
+  const result = transformProps(
+    createChartProps({ xAxisTimeFormat: '%Y-%m-%d' }),
+  );
+  const formatted = result.timeFormatter(1704067200000);
+  expect(typeof formatted).toBe('string');
+  expect(formatted.length).toBeGreaterThan(0);
+});
 
-  test('creates a valueFormatter function', () => {
-    const result = transformProps(createChartProps());
-    expect(typeof result.valueFormatter).toBe('function');
-  });
+test('transformProps creates a valueFormatter function', () => {
+  const result = transformProps(createChartProps());
+  expect(typeof result.valueFormatter).toBe('function');
+});
 
-  test('valueFormatter formats numbers', () => {
-    const result = transformProps(createChartProps({ yAxisFormat: '.3s' }));
-    const formatted = result.valueFormatter(1500);
-    expect(typeof formatted).toBe('string');
-  });
+test('transformProps valueFormatter formats numbers', () => {
+  const result = transformProps(createChartProps({ yAxisFormat: '.3s' }));
+  const formatted = result.valueFormatter(1500);
+  expect(typeof formatted).toBe('string');
+});
 
-  test('returns all expected keys', () => {
-    const result = transformProps(createChartProps());
-    expect(Object.keys(result).sort()).toEqual(
-      [
-        'height',
-        'data',
-        'cellPadding',
-        'cellRadius',
-        'cellSize',
-        'domainGranularity',
-        'linearColorScheme',
-        'showLegend',
-        'showMetricName',
-        'showValues',
-        'steps',
-        'subdomainGranularity',
-        'timeFormatter',
-        'valueFormatter',
-        'verboseMap',
-      ].sort(),
-    );
-  });
+test('transformProps returns all expected keys', () => {
+  const result = transformProps(createChartProps());
+  expect(Object.keys(result).sort()).toEqual(
+    [
+      'height',
+      'data',
+      'cellPadding',
+      'cellRadius',
+      'cellSize',
+      'domainGranularity',
+      'linearColorScheme',
+      'showLegend',
+      'showMetricName',
+      'showValues',
+      'steps',
+      'subdomainGranularity',
+      'timeFormatter',
+      'valueFormatter',
+      'verboseMap',
+    ].sort(),
+  );
+});
 
-  test('passes through default formData values', () => {
-    const result = transformProps(createChartProps());
-    expect(result).toEqual(
-      expect.objectContaining({
-        cellPadding: 3,
-        cellRadius: 0,
-        cellSize: 10,
-        domainGranularity: 'month',
-        linearColorScheme: 'schemeRdYlBu',
-        showLegend: true,
-        showMetricName: true,
-        showValues: false,
-        steps: 10,
-        subdomainGranularity: 'day',
-      }),
-    );
-  });
+test('transformProps passes through default formData values', () => {
+  const result = transformProps(createChartProps());
+  expect(result).toEqual(
+    expect.objectContaining({
+      cellPadding: 3,
+      cellRadius: 0,
+      cellSize: 10,
+      domainGranularity: 'month',
+      linearColorScheme: 'schemeRdYlBu',
+      showLegend: true,
+      showMetricName: true,
+      showValues: false,
+      steps: 10,
+      subdomainGranularity: 'day',
+    }),
+  );
 });

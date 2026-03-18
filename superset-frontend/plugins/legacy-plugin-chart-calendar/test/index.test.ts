@@ -40,82 +40,80 @@ jest.mock('../src/vendor/cal-heatmap', () => {
 // eslint-disable-next-line import/first
 import CalendarChartPlugin from '../src/index';
 
-describe('CalendarChartPlugin', () => {
-  test('is a subclass of ChartPlugin', () => {
-    const plugin = new CalendarChartPlugin();
-    expect(plugin).toBeInstanceOf(ChartPlugin);
-  });
+test('CalendarChartPlugin is a subclass of ChartPlugin', () => {
+  const plugin = new CalendarChartPlugin();
+  expect(plugin).toBeInstanceOf(ChartPlugin);
+});
 
-  test('has metadata defined', () => {
-    const plugin = new CalendarChartPlugin();
-    expect(plugin.metadata).toBeDefined();
-  });
+test('CalendarChartPlugin has metadata defined', () => {
+  const plugin = new CalendarChartPlugin();
+  expect(plugin.metadata).toBeDefined();
+});
 
-  test('metadata has correct name', () => {
-    const plugin = new CalendarChartPlugin();
-    expect(plugin.metadata?.name).toBeDefined();
-  });
+test('CalendarChartPlugin metadata has correct name', () => {
+  const plugin = new CalendarChartPlugin();
+  expect(plugin.metadata?.name).toBeDefined();
+});
 
-  test('metadata has description', () => {
-    const plugin = new CalendarChartPlugin();
-    expect(plugin.metadata?.description).toBeDefined();
-  });
+test('CalendarChartPlugin metadata has description', () => {
+  const plugin = new CalendarChartPlugin();
+  expect(plugin.metadata?.description).toBeDefined();
+});
 
-  test('metadata has thumbnail', () => {
-    const plugin = new CalendarChartPlugin();
-    expect(plugin.metadata?.thumbnail).toBeDefined();
-  });
+test('CalendarChartPlugin metadata has thumbnail', () => {
+  const plugin = new CalendarChartPlugin();
+  expect(plugin.metadata?.thumbnail).toBeDefined();
+});
 
-  test('metadata has useLegacyApi set to true', () => {
-    const plugin = new CalendarChartPlugin();
-    expect(plugin.metadata?.useLegacyApi).toBe(true);
-  });
+test('CalendarChartPlugin metadata has useLegacyApi set to true', () => {
+  const plugin = new CalendarChartPlugin();
+  expect(plugin.metadata?.useLegacyApi).toBe(true);
+});
 
-  test('metadata has tags', () => {
-    const plugin = new CalendarChartPlugin();
-    expect(plugin.metadata?.tags).toBeDefined();
-    expect(Array.isArray(plugin.metadata?.tags)).toBe(true);
-    expect(plugin.metadata?.tags?.length).toBeGreaterThan(0);
-  });
+test('CalendarChartPlugin metadata has tags', () => {
+  const plugin = new CalendarChartPlugin();
+  expect(plugin.metadata?.tags).toBeDefined();
+  expect(Array.isArray(plugin.metadata?.tags)).toBe(true);
+  expect(plugin.metadata?.tags?.length).toBeGreaterThan(0);
+});
 
-  test('metadata has category', () => {
-    const plugin = new CalendarChartPlugin();
-    expect(plugin.metadata?.category).toBeDefined();
-  });
+test('CalendarChartPlugin metadata has category', () => {
+  const plugin = new CalendarChartPlugin();
+  expect(plugin.metadata?.category).toBeDefined();
+});
 
-  test('metadata has credits', () => {
-    const plugin = new CalendarChartPlugin();
-    expect(plugin.metadata?.credits).toBeDefined();
-    expect(plugin.metadata?.credits).toContain(
-      'https://github.com/wa0x6e/cal-heatmap',
-    );
-  });
+test('CalendarChartPlugin metadata has credits', () => {
+  const plugin = new CalendarChartPlugin();
+  expect(plugin.metadata?.credits).toBeDefined();
+  expect(plugin.metadata?.credits).toContain(
+    'https://github.com/wa0x6e/cal-heatmap',
+  );
+});
 
-  test('metadata has exampleGallery', () => {
-    const plugin = new CalendarChartPlugin();
-    expect(plugin.metadata?.exampleGallery).toBeDefined();
-    expect(plugin.metadata?.exampleGallery?.length).toBeGreaterThan(0);
-  });
+test('CalendarChartPlugin metadata has exampleGallery', () => {
+  const plugin = new CalendarChartPlugin();
+  expect(plugin.metadata?.exampleGallery).toBeDefined();
+  expect(plugin.metadata?.exampleGallery?.length).toBeGreaterThan(0);
+});
 
-  test('has loadChart function', () => {
-    const plugin = new CalendarChartPlugin();
-    expect(plugin.loadChart).toBeDefined();
-  });
+test('CalendarChartPlugin has loadChart function', () => {
+  const plugin = new CalendarChartPlugin();
+  expect(plugin.loadChart).toBeDefined();
+});
 
-  test('has transformProps function', () => {
-    const plugin = new CalendarChartPlugin();
-    expect(plugin.loadTransformProps).toBeDefined();
-  });
+test('CalendarChartPlugin has transformProps function', () => {
+  const plugin = new CalendarChartPlugin();
+  expect(plugin.loadTransformProps).toBeDefined();
+});
 
-  test('loadChart returns a module with default export', async () => {
-    const plugin = new CalendarChartPlugin();
-    const module = await plugin.loadChart!();
-    expect(module).toBeDefined();
-  });
+test('CalendarChartPlugin loadChart returns a module with default export', async () => {
+  const plugin = new CalendarChartPlugin();
+  const module = await plugin.loadChart!();
+  expect(module).toBeDefined();
+});
 
-  test('can be configured with a key', () => {
-    const plugin = new CalendarChartPlugin();
-    const configured = plugin.configure({ key: 'calendar' });
-    expect(configured).toBe(plugin);
-  });
+test('CalendarChartPlugin can be configured with a key', () => {
+  const plugin = new CalendarChartPlugin();
+  const configured = plugin.configure({ key: 'calendar' });
+  expect(configured).toBe(plugin);
 });

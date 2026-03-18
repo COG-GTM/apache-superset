@@ -54,84 +54,82 @@ function renderWithTheme(ui: React.ReactElement) {
   return render(<ThemeProvider theme={supersetTheme}>{ui}</ThemeProvider>);
 }
 
-describe('ReactCalendar', () => {
-  test('renders without crashing', () => {
-    const { container } = renderWithTheme(
-      <ReactCalendar width={800} height={400} />,
-    );
-    expect(container.firstChild).toBeDefined();
-  });
+test('ReactCalendar renders without crashing', () => {
+  const { container } = renderWithTheme(
+    <ReactCalendar width={800} height={400} />,
+  );
+  expect(container.firstChild).toBeDefined();
+});
 
-  test('renders a wrapper div', () => {
-    const { container } = renderWithTheme(
-      <ReactCalendar width={800} height={400} />,
-    );
-    expect(container.querySelector('div')).not.toBeNull();
-  });
+test('ReactCalendar renders a wrapper div', () => {
+  const { container } = renderWithTheme(
+    <ReactCalendar width={800} height={400} />,
+  );
+  expect(container.querySelector('div')).not.toBeNull();
+});
 
-  test('accepts className prop', () => {
-    const { container } = renderWithTheme(
-      <ReactCalendar className="my-calendar" width={800} height={400} />,
-    );
-    const wrapper = container.firstChild as HTMLElement;
-    expect(wrapper.className).toContain('my-calendar');
-  });
+test('ReactCalendar accepts className prop', () => {
+  const { container } = renderWithTheme(
+    <ReactCalendar className="my-calendar" width={800} height={400} />,
+  );
+  const wrapper = container.firstChild as HTMLElement;
+  expect(wrapper.className).toContain('my-calendar');
+});
 
-  test('passes additional props through to the component', () => {
-    const { container } = renderWithTheme(
-      <ReactCalendar
-        width={800}
-        height={400}
-        showLegend
-        showValues={false}
-        steps={10}
-      />,
-    );
-    expect(container.firstChild).toBeDefined();
-  });
+test('ReactCalendar passes additional props through to the component', () => {
+  const { container } = renderWithTheme(
+    <ReactCalendar
+      width={800}
+      height={400}
+      showLegend
+      showValues={false}
+      steps={10}
+    />,
+  );
+  expect(container.firstChild).toBeDefined();
+});
 
-  test('renders Global styles component', () => {
-    const { container } = renderWithTheme(
-      <ReactCalendar width={800} height={400} />,
-    );
-    // The component renders without error, which confirms the Global
-    // styles component is included in the render tree
-    expect(container.firstChild).toBeDefined();
-    expect(container.innerHTML.length).toBeGreaterThan(0);
-  });
+test('ReactCalendar renders Global styles component', () => {
+  const { container } = renderWithTheme(
+    <ReactCalendar width={800} height={400} />,
+  );
+  // The component renders without error, which confirms the Global
+  // styles component is included in the render tree
+  expect(container.firstChild).toBeDefined();
+  expect(container.innerHTML.length).toBeGreaterThan(0);
+});
 
-  test('renders styled component CSS', () => {
-    const { container } = renderWithTheme(
-      <ReactCalendar width={800} height={400} />,
-    );
-    // The styled component wraps with a generated class
-    const wrapper = container.firstChild as HTMLElement;
-    expect(wrapper.className).toBeDefined();
-    expect(wrapper.className.length).toBeGreaterThan(0);
-  });
+test('ReactCalendar renders styled component CSS', () => {
+  const { container } = renderWithTheme(
+    <ReactCalendar width={800} height={400} />,
+  );
+  // The styled component wraps with a generated class
+  const wrapper = container.firstChild as HTMLElement;
+  expect(wrapper.className).toBeDefined();
+  expect(wrapper.className.length).toBeGreaterThan(0);
+});
 
-  test('renders with different prop combinations', () => {
-    const { container: c1 } = renderWithTheme(
-      <ReactCalendar width={400} height={200} showLegend showMetricName />,
-    );
-    expect(c1.firstChild).toBeDefined();
+test('ReactCalendar renders with different prop combinations', () => {
+  const { container: c1 } = renderWithTheme(
+    <ReactCalendar width={400} height={200} showLegend showMetricName />,
+  );
+  expect(c1.firstChild).toBeDefined();
 
-    const { container: c2 } = renderWithTheme(
-      <ReactCalendar
-        width={1200}
-        height={800}
-        showLegend={false}
-        showValues
-        showMetricName={false}
-      />,
-    );
-    expect(c2.firstChild).toBeDefined();
-  });
+  const { container: c2 } = renderWithTheme(
+    <ReactCalendar
+      width={1200}
+      height={800}
+      showLegend={false}
+      showValues
+      showMetricName={false}
+    />,
+  );
+  expect(c2.firstChild).toBeDefined();
+});
 
-  test('renders without optional className', () => {
-    const { container } = renderWithTheme(
-      <ReactCalendar width={800} height={400} />,
-    );
-    expect(container.firstChild).toBeDefined();
-  });
+test('ReactCalendar renders without optional className', () => {
+  const { container } = renderWithTheme(
+    <ReactCalendar width={800} height={400} />,
+  );
+  expect(container.firstChild).toBeDefined();
 });
