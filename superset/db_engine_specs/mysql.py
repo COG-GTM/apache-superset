@@ -47,10 +47,13 @@ from superset.db_engine_specs.base import (
     BasicParametersMixin,
     DatabaseCategory,
 )
+from superset.db_engine_specs.lib import validate_int_id
 from superset.errors import SupersetErrorType
 from superset.models.sql_lab import Query
 from superset.utils import json
 from superset.utils.core import GenericDataType
+
+_SAFE_DTTM_RE = re.compile(r"^[\d:T .+-]+$")
 
 if TYPE_CHECKING:
     from superset.models.core import Database
@@ -358,9 +361,16 @@ class MySQLEngineSpec(BasicParametersMixin, BaseEngineSpec):
         sqla_type = cls.get_sqla_column_type(target_type)
 
         if isinstance(sqla_type, types.Date):
-            return f"STR_TO_DATE('{dttm.date().isoformat()}', '%Y-%m-%d')"
+            date_str = dttm.date().isoformat()
+            if not _SAFE_DTTM_RE.match(date_str):
+                raise ValueError(f"Unsafe date literal: {date_str!r}")
+            return f"STR_TO_DATE('{date_str}', '%Y-%m-%d')"
         if isinstance(sqla_type, types.DateTime):
             datetime_formatted = dttm.isoformat(sep=" ", timespec="microseconds")
+            if not _SAFE_DTTM_RE.match(datetime_formatted):
+                raise ValueError(
+                    f"Unsafe datetime literal: {datetime_formatted!r}"
+                )
             return f"""STR_TO_DATE('{datetime_formatted}', '%Y-%m-%d %H:%i:%s.%f')"""
         return None
 
@@ -453,7 +463,8 @@ class MySQLEngineSpec(BasicParametersMixin, BaseEngineSpec):
         :return: True if query cancelled successfully, False otherwise
         """
         try:
-            cursor.execute(f"KILL CONNECTION {cancel_query_id}")
+            validated_id = validate_int_id(cancel_query_id)
+            cursor.execute("KILL CONNECTION %s", (validated_id,))
         except Exception:  # pylint: disable=broad-except
             return False
 

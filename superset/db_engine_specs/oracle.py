@@ -14,6 +14,7 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+import re
 from datetime import datetime
 from typing import Any, Optional
 
@@ -21,6 +22,8 @@ from sqlalchemy import types
 
 from superset.constants import TimeGrain
 from superset.db_engine_specs.base import BaseEngineSpec, DatabaseCategory
+
+_SAFE_DTTM_RE = re.compile(r"^[\d:T .+-]+$")
 
 
 class OracleEngineSpec(BaseEngineSpec):
@@ -64,14 +67,26 @@ class OracleEngineSpec(BaseEngineSpec):
         sqla_type = cls.get_sqla_column_type(target_type)
 
         if isinstance(sqla_type, types.Date):
-            return f"TO_DATE('{dttm.date().isoformat()}', 'YYYY-MM-DD')"
+            date_str = dttm.date().isoformat()
+            if not _SAFE_DTTM_RE.match(date_str):
+                raise ValueError(f"Unsafe date literal: {date_str!r}")
+            return f"TO_DATE('{date_str}', 'YYYY-MM-DD')"
         if isinstance(sqla_type, types.TIMESTAMP):
-            return f"""TO_TIMESTAMP('{
-                dttm.isoformat(timespec="microseconds")
-            }', 'YYYY-MM-DD"T"HH24:MI:SS.ff6')"""
+            ts_str = dttm.isoformat(timespec="microseconds")
+            if not _SAFE_DTTM_RE.match(ts_str):
+                raise ValueError(f"Unsafe timestamp literal: {ts_str!r}")
+            return (
+                f"TO_TIMESTAMP('{ts_str}', 'YYYY-MM-DD\"T\"HH24:MI:SS.ff6')"
+            )
         if isinstance(sqla_type, types.DateTime):
             datetime_formatted = dttm.isoformat(timespec="seconds")
-            return f"""TO_DATE('{datetime_formatted}', 'YYYY-MM-DD"T"HH24:MI:SS')"""
+            if not _SAFE_DTTM_RE.match(datetime_formatted):
+                raise ValueError(
+                    f"Unsafe datetime literal: {datetime_formatted!r}"
+                )
+            return (
+                f"TO_DATE('{datetime_formatted}', 'YYYY-MM-DD\"T\"HH24:MI:SS')"
+            )
         return None
 
     @classmethod
