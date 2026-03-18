@@ -180,9 +180,91 @@ class SupersetUserApi(UserApi):
 
     def pre_delete(self, item: Model) -> None:
         """
-        Overriding this method to be able to delete items when they have constraints
+        Clean up all associated data before deleting a user.
+
+        This handles foreign key constraints that would otherwise prevent user
+        deletion with "Associated data exists, please delete them first" errors.
+
+        Strategy:
+        - Nullable FK columns (created_by_fk, changed_by_fk, etc.): SET NULL
+        - Owned records without cascade (FavStar, UserAttribute, etc.): DELETE
+        - Many-to-many associations (roles, tags): CLEAR
+        - Records with ondelete=CASCADE are handled automatically by the DB
         """
+        # pylint: disable=import-outside-toplevel
+        from superset.connectors.sqla.models import SqlaTable
+        from superset.key_value.models import KeyValueEntry
+        from superset.models.core import FavStar, Log
+        from superset.models.dashboard import Dashboard
+        from superset.models.slice import Slice
+        from superset.models.sql_lab import Query, SavedQuery, TabState
+        from superset.models.user_attributes import UserAttribute
+        from superset.tags.models import user_favorite_tag_table
+
+        session = self.appbuilder.get_session
+        user_id = item.id
+
+        # Clear many-to-many associations
         item.roles = []
+
+        # Nullify created_by_fk and changed_by_fk across all AuditMixin models.
+        # These are nullable FK columns defined in AuditMixinNullable, used by
+        # Dashboard, Slice, SqlaTable, SavedQuery, KeyValueEntry, and many more.
+        for model_cls in (
+            Dashboard,
+            Slice,
+            SqlaTable,
+            SavedQuery,
+            KeyValueEntry,
+        ):
+            session.query(model_cls).filter(
+                model_cls.created_by_fk == user_id
+            ).update({model_cls.created_by_fk: None}, synchronize_session="fetch")
+            session.query(model_cls).filter(
+                model_cls.changed_by_fk == user_id
+            ).update({model_cls.changed_by_fk: None}, synchronize_session="fetch")
+
+        # Nullify last_saved_by_fk on charts
+        session.query(Slice).filter(Slice.last_saved_by_fk == user_id).update(
+            {Slice.last_saved_by_fk: None}, synchronize_session="fetch"
+        )
+
+        # Nullify user_id on queries (preserves query history)
+        session.query(Query).filter(Query.user_id == user_id).update(
+            {Query.user_id: None}, synchronize_session="fetch"
+        )
+
+        # Nullify user_id on logs (preserves audit trail)
+        session.query(Log).filter(Log.user_id == user_id).update(
+            {Log.user_id: None}, synchronize_session="fetch"
+        )
+
+        # Delete tab states owned by the user (cascades to table_schema)
+        session.query(TabState).filter(TabState.user_id == user_id).delete(
+            synchronize_session="fetch"
+        )
+
+        # Delete saved queries owned by the user
+        session.query(SavedQuery).filter(SavedQuery.user_id == user_id).delete(
+            synchronize_session="fetch"
+        )
+
+        # Delete user's favorite stars
+        session.query(FavStar).filter(FavStar.user_id == user_id).delete(
+            synchronize_session="fetch"
+        )
+
+        # Delete user attributes
+        session.query(UserAttribute).filter(
+            UserAttribute.user_id == user_id
+        ).delete(synchronize_session="fetch")
+
+        # Delete user favorite tag associations
+        session.execute(
+            user_favorite_tag_table.delete().where(
+                user_favorite_tag_table.c.user_id == user_id
+            )
+        )
 
 
 # Limiting routes on FAB model views
