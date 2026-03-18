@@ -22,16 +22,14 @@
     "esm",
     "lib"
   ],
-  "dependencies": {
-    "d3": "^3.5.17",
-    "nvd3-fork": "^2.0.5",
-    "prop-types": "^15.8.1"
-  },
+  "sideEffects": false,
+  "dependencies": {},
   "peerDependencies": {
-    "@emotion/react": "^11.4.1",
+    "@apache-superset/core": "*",
     "@superset-ui/chart-controls": "*",
     "@superset-ui/core": "*",
-    "@apache-superset/core": "*",
+    "@superset-ui/plugin-chart-echarts": "*",
+    "echarts": "*",
     "react": "^17.0.2"
   },
   "publishConfig": {
