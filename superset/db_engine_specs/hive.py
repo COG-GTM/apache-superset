@@ -213,8 +213,9 @@ class HiveEngineSpec(PrestoEngineSpec):
                     f"SHOW TABLES IN `{escaped_schema}` LIKE '{escaped_table_name}'"
                 ).empty
             else:
+                escaped_table_name = table.table.replace("'", "\\'")
                 table_exists = not database.get_df(
-                    f"SHOW TABLES LIKE '{table.table}'"
+                    f"SHOW TABLES LIKE '{escaped_table_name}'"
                 ).empty
 
             if table_exists:
@@ -225,8 +226,16 @@ class HiveEngineSpec(PrestoEngineSpec):
                 catalog=table.catalog,
                 schema=table.schema,
             ) as engine:
-                escaped_table = str(table).replace("`", "``")
-                engine.execute(f"DROP TABLE IF EXISTS `{escaped_table}`")
+                escaped_table_name = table.table.replace("`", "``")
+                if table.schema:
+                    escaped_schema = table.schema.replace("`", "``")
+                    engine.execute(
+                        f"DROP TABLE IF EXISTS `{escaped_schema}`.`{escaped_table_name}`"
+                    )
+                else:
+                    engine.execute(
+                        f"DROP TABLE IF EXISTS `{escaped_table_name}`"
+                    )
 
         def _get_hive_type(dtype: np.dtype[Any]) -> str:
             hive_type_by_dtype = {
