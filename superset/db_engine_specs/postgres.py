@@ -461,9 +461,10 @@ class PostgresEngineSpec(BasicParametersMixin, PostgresBaseEngineSpec):
     try_remove_schema_from_table_name = False  # pylint: disable=invalid-name
 
     # Sensitive fields that should be masked in encrypted_extra.
-    # This follows the pattern used by other engine specs (bigquery, snowflake, etc.)
-    # that specify exact paths rather than using the base class's catch-all "$.*".
+    # Includes the base class's catch-all "$.*" wildcard as a fallback to ensure
+    # any new fields added to encrypted_extra are masked by default.
     encrypted_extra_sensitive_fields = {
+        "$.*": "Encrypted Extra",
         "$.aws_iam.external_id": "AWS IAM External ID",
         "$.aws_iam.role_arn": "AWS IAM Role ARN",
     }

@@ -14,12 +14,26 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
+import ipaddress
 import platform
 import socket
 import subprocess
 
 PORT_TIMEOUT = 5
 PING_TIMEOUT = 5
+
+
+def is_private_ip(host: str) -> bool:
+    """Check if any resolved address for the host is private/reserved."""
+    try:
+        for res in socket.getaddrinfo(host, None, 0, socket.SOCK_STREAM):
+            _, _, _, _, sockaddr = res
+            ip = ipaddress.ip_address(sockaddr[0])
+            if ip.is_private or ip.is_reserved or ip.is_loopback or ip.is_link_local:
+                return True
+    except socket.gaierror:
+        pass
+    return False
 
 
 def is_port_open(host: str, port: int) -> bool:
@@ -29,6 +43,9 @@ def is_port_open(host: str, port: int) -> bool:
     # pylint: disable=invalid-name
     for res in socket.getaddrinfo(host, port, 0, socket.SOCK_STREAM):
         af, _, _, _, sockaddr = res
+        ip = ipaddress.ip_address(sockaddr[0])
+        if ip.is_private or ip.is_reserved or ip.is_loopback or ip.is_link_local:
+            continue
         s = socket.socket(af, socket.SOCK_STREAM)
         try:
             s.settimeout(PORT_TIMEOUT)
@@ -44,10 +61,13 @@ def is_port_open(host: str, port: int) -> bool:
 
 def is_hostname_valid(host: str) -> bool:
     """
-    Test if a given hostname can be resolved.
+    Test if a given hostname can be resolved and does not point to a
+    private/reserved IP address.
     """
     try:
         socket.getaddrinfo(host, None)
+        if is_private_ip(host):
+            return False
         return True
     except socket.gaierror:
         return False

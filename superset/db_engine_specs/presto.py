@@ -1325,7 +1325,12 @@ class PrestoEngineSpec(PrestoBaseEngineSpec):
 
         with database.get_raw_connection(schema=schema) as conn:
             cursor = conn.cursor()
-            sql = f"SHOW CREATE VIEW {schema}.{table}"
+            escaped_schema = schema.replace('"', '""') if schema else schema
+            escaped_table = table.replace('"', '""')
+            if escaped_schema:
+                sql = f'SHOW CREATE VIEW "{escaped_schema}"."{escaped_table}"'
+            else:
+                sql = f'SHOW CREATE VIEW "{escaped_table}"'
             try:
                 cls.execute(cursor, sql, database)
                 rows = cls.fetch_data(cursor, 1)
