@@ -38,6 +38,7 @@ import {
   getChartPadding,
   sanitizeHtml,
 } from '@superset-ui/plugin-chart-echarts/utils/series';
+import { getDefaultTooltip } from '@superset-ui/plugin-chart-echarts/utils/tooltip';
 /* eslint-enable import/no-unresolved */
 import {
   DEFAULT_FORM_DATA,
@@ -82,7 +83,7 @@ export default function transformProps(
     emitCrossFilters,
   } = chartProps;
   const { data: rawData = [] } = queriesData[0];
-  const coltypeMapping = getColtypesMapping(queriesData[0] as any);
+  const coltypeMapping = getColtypesMapping(queriesData[0]);
 
   const {
     colorScheme,
@@ -234,7 +235,7 @@ export default function transformProps(
         label: {
           show: true,
           fontWeight: 'bold',
-          backgroundColor: theme.colorBgLayout,
+          backgroundColor: theme.colorBgContainer,
         },
       },
       data: transformedData,
@@ -246,11 +247,9 @@ export default function transformProps(
       containLabel: true,
     },
     tooltip: {
+      ...getDefaultTooltip(refs),
       show: !inContextMenu,
       trigger: 'item',
-      appendToBody: true,
-      borderColor: 'transparent',
-      className: 'echarts-tooltip',
       formatter: (params: CallbackDataParams) => {
         const [name, formattedValue, formattedPercent] = parseParams({
           params,

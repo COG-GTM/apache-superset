@@ -22,6 +22,3 @@ export enum OpacityEnum {
   SemiTransparent = 0.3,
   NonTransparent = 1,
 }
-
-export const TOOLTIP_POINTER_MARGIN = 10;
-export const TOOLTIP_OVERFLOW_MARGIN = 5;
