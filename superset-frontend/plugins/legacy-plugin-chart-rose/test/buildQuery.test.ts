@@ -1,0 +1,52 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+import buildQuery from '../src/buildQuery';
+
+const formData = {
+  datasource: '5__table',
+  granularity_sqla: 'ds',
+  metric: 'foo',
+  groupby: ['bar'],
+  viz_type: 'rose',
+};
+
+test('Rose buildQuery: should build query fields from form data', () => {
+  const queryContext = buildQuery(formData);
+  const [query] = queryContext.queries;
+  expect(query.metrics).toEqual(['foo']);
+  expect(query.columns).toEqual(['bar']);
+});
+
+test('Rose buildQuery: should order by metric when sort_by_metric is true', () => {
+  const queryContext = buildQuery({
+    ...formData,
+    sort_by_metric: true,
+  });
+  const [query] = queryContext.queries;
+  expect(query.orderby).toEqual([['foo', false]]);
+});
+
+test('Rose buildQuery: should not order by metric when sort_by_metric is false', () => {
+  const queryContext = buildQuery({
+    ...formData,
+    sort_by_metric: false,
+  });
+  const [query] = queryContext.queries;
+  expect(query.orderby).toBeUndefined();
+});

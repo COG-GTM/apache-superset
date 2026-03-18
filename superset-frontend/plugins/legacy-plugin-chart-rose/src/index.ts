@@ -17,7 +17,9 @@
  * under the License.
  */
 import { t } from '@apache-superset/core/translation';
-import { ChartMetadata, ChartPlugin } from '@superset-ui/core';
+import { Behavior, ChartMetadata, ChartPlugin } from '@superset-ui/core';
+import buildQuery from './buildQuery';
+import controlPanel from './controlPanel';
 import transformProps from './transformProps';
 import thumbnail from './images/thumbnail.png';
 import thumbnailDark from './images/thumbnail-dark.png';
@@ -25,39 +27,49 @@ import example1 from './images/example1.jpg';
 import example1Dark from './images/example1-dark.jpg';
 import example2 from './images/example2.jpg';
 import example2Dark from './images/example2-dark.jpg';
-import controlPanel from './controlPanel';
+import { EchartsRoseFormData, EchartsRoseChartProps } from './types';
 
-const metadata = new ChartMetadata({
-  category: t('Ranking'),
-  description: t(
-    'A polar coordinate chart where the circle is broken into wedges of equal angle, and the value represented by any wedge is illustrated by its area, rather than its radius or sweep angle.',
-  ),
-  exampleGallery: [
-    { url: example1, urlDark: example1Dark },
-    { url: example2, urlDark: example2Dark },
-  ],
-  name: t('Nightingale Rose Chart'),
-  tags: [
-    t('Legacy'),
-    t('Advanced-Analytics'),
-    t('Circular'),
-    t('Multi-Layers'),
-    t('Pattern'),
-    t('Time'),
-    t('Trend'),
-  ],
-  thumbnail,
-  thumbnailDark,
-  useLegacyApi: true,
-});
-
-export default class RoseChartPlugin extends ChartPlugin {
+export default class RoseChartPlugin extends ChartPlugin<
+  EchartsRoseFormData,
+  EchartsRoseChartProps
+> {
   constructor() {
     super({
-      loadChart: () => import('./ReactRose'),
-      metadata,
-      transformProps,
+      buildQuery,
       controlPanel,
+      loadChart: () => import('./EchartsRose'),
+      metadata: new ChartMetadata({
+        behaviors: [
+          Behavior.InteractiveChart,
+          Behavior.DrillToDetail,
+          Behavior.DrillBy,
+        ],
+        category: t('Ranking'),
+        credits: ['https://echarts.apache.org'],
+        description: t(
+          'A polar coordinate chart where the circle is broken into wedges of equal angle, and the value represented by any wedge is illustrated by its area, rather than its radius or sweep angle.',
+        ),
+        exampleGallery: [
+          { url: example1, urlDark: example1Dark },
+          { url: example2, urlDark: example2Dark },
+        ],
+        name: t('Nightingale Rose Chart'),
+        parseMethod: 'json',
+        tags: [
+          t('Categorical'),
+          t('Circular'),
+          t('Comparison'),
+          t('ECharts'),
+          t('Multi-Layers'),
+          t('Pattern'),
+          t('Proportional'),
+          t('Time'),
+          t('Trend'),
+        ],
+        thumbnail,
+        thumbnailDark,
+      }),
+      transformProps,
     });
   }
 }
