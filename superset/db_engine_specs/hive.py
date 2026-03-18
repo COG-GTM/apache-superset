@@ -207,8 +207,10 @@ class HiveEngineSpec(PrestoEngineSpec):
         if to_sql_kwargs["if_exists"] == "fail":
             # Ensure table doesn't already exist.
             if table.schema:
+                escaped_schema = table.schema.replace("`", "``")
+                escaped_table_name = table.table.replace("'", "\\'")
                 table_exists = not database.get_df(
-                    f"SHOW TABLES IN {table.schema} LIKE '{table.table}'"
+                    f"SHOW TABLES IN `{escaped_schema}` LIKE '{escaped_table_name}'"
                 ).empty
             else:
                 table_exists = not database.get_df(
@@ -223,7 +225,8 @@ class HiveEngineSpec(PrestoEngineSpec):
                 catalog=table.catalog,
                 schema=table.schema,
             ) as engine:
-                engine.execute(f"DROP TABLE IF EXISTS {str(table)}")
+                escaped_table = str(table).replace("`", "``")
+                engine.execute(f"DROP TABLE IF EXISTS `{escaped_table}`")
 
         def _get_hive_type(dtype: np.dtype[Any]) -> str:
             hive_type_by_dtype = {
@@ -628,7 +631,8 @@ class HiveEngineSpec(PrestoEngineSpec):
         sql = "SHOW VIEWS"
 
         if schema:
-            sql += f" IN `{schema}`"
+            escaped_schema = schema.replace("`", "``")
+            sql += f" IN `{escaped_schema}`"
 
         with database.get_raw_connection(schema=schema) as conn:
             cursor = conn.cursor()

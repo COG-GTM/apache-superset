@@ -17,8 +17,10 @@
 from __future__ import annotations
 
 import contextlib
+import inspect
 import logging
 import math
+import re
 import threading
 import time
 from typing import Any, TYPE_CHECKING
@@ -427,6 +429,10 @@ class TrinoEngineSpec(PrestoBaseEngineSpec):
         :return: True if query cancelled successfully, False otherwise
         """
         try:
+            if not re.match(r"^[a-zA-Z0-9_-]+$", cancel_query_id):
+                raise ValueError(
+                    f"Invalid Trino query ID format: {cancel_query_id}"
+                )
             cursor.execute(
                 f"CALL system.runtime.kill_query(query_id => '{cancel_query_id}',"
                 "message => 'Query cancelled by Superset')"
@@ -499,7 +505,11 @@ class TrinoEngineSpec(PrestoBaseEngineSpec):
                         f"must be listed in 'ALLOWED_EXTRA_AUTHENTICATIONS' config"
                     )
 
-            connect_args["auth"] = trino_auth(**auth_params)
+            valid_params = inspect.signature(trino_auth).parameters
+            filtered_auth_params = {
+                k: v for k, v in auth_params.items() if k in valid_params
+            }
+            connect_args["auth"] = trino_auth(**filtered_auth_params)
         except json.JSONDecodeError as ex:
             logger.error(ex, exc_info=True)
             raise
