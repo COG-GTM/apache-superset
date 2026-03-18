@@ -30,423 +30,296 @@ import type {
 import transformProps, { parseParams } from '../src/transformProps';
 import { EchartsRoseChartProps } from '../src/types';
 
-describe('Rose transformProps', () => {
-  const formData: SqlaFormData = {
-    colorScheme: 'bnbColors',
-    datasource: '3__table',
-    granularity_sqla: 'ds',
-    metric: 'sum__num',
-    groupby: ['foo', 'bar'],
-    viz_type: 'rose',
-  };
+const baseFormData: SqlaFormData = {
+  colorScheme: 'bnbColors',
+  datasource: '3__table',
+  granularity_sqla: 'ds',
+  metric: 'sum__num',
+  groupby: ['foo', 'bar'],
+  viz_type: 'rose',
+};
 
-  const chartProps = new ChartProps({
-    formData,
+const baseData = [
+  { foo: 'Sylvester', bar: 1, sum__num: 10 },
+  { foo: 'Arnold', bar: 2, sum__num: 2.5 },
+];
+
+function makeChartProps(
+  formOverrides: Partial<SqlaFormData> = {},
+  data: Record<string, unknown>[] = baseData,
+): EchartsRoseChartProps {
+  return new ChartProps({
+    formData: { ...baseFormData, ...formOverrides },
     width: 800,
     height: 600,
-    queriesData: [
-      {
-        data: [
-          { foo: 'Sylvester', bar: 1, sum__num: 10 },
-          { foo: 'Arnold', bar: 2, sum__num: 2.5 },
+    queriesData: [{ data }],
+    theme: supersetTheme,
+  }) as EchartsRoseChartProps;
+}
+
+test('Rose transformProps: should transform chart props for viz', () => {
+  const transformed = transformProps(makeChartProps());
+  expect(transformed).toEqual(
+    expect.objectContaining({
+      width: 800,
+      height: 600,
+      echartOptions: expect.objectContaining({
+        series: [
+          expect.objectContaining({
+            type: 'pie',
+            roseType: 'radius',
+            avoidLabelOverlap: true,
+            data: expect.arrayContaining([
+              expect.objectContaining({
+                name: 'Sylvester, 1',
+                value: 10,
+              }),
+              expect.objectContaining({
+                name: 'Arnold, 2',
+                value: 2.5,
+              }),
+            ]),
+          }),
         ],
-      },
-    ],
+      }),
+    }),
+  );
+});
+
+test('Rose transformProps: should use area roseType when useAreaProportions is true', () => {
+  const transformed = transformProps(
+    makeChartProps({ use_area_proportions: true }),
+  );
+  const series = transformed.echartOptions.series as PieSeriesOption[];
+  expect(series[0].roseType).toBe('area');
+});
+
+test('Rose transformProps: should use radius roseType when useAreaProportions is false', () => {
+  const transformed = transformProps(
+    makeChartProps({ use_area_proportions: false }),
+  );
+  const series = transformed.echartOptions.series as PieSeriesOption[];
+  expect(series[0].roseType).toBe('radius');
+});
+
+test('Rose transformProps: should return labelMap', () => {
+  const transformed = transformProps(makeChartProps());
+  expect(transformed.labelMap).toEqual({
+    'Sylvester, 1': ['Sylvester', 1],
+    'Arnold, 2': ['Arnold', 2],
+  });
+});
+
+test('Rose transformProps: should have donut shape when isDonut is true', () => {
+  const transformed = transformProps(
+    makeChartProps(
+      { is_donut: true, innerRadius: 40 },
+      [{ foo: 'Sylvester', bar: 1, sum__num: 10 }],
+    ),
+  );
+  const series = transformed.echartOptions.series as PieSeriesOption[];
+  expect(series[0].radius).toEqual(['40%', '70%']);
+});
+
+test('Rose transformProps: should have filled shape when isDonut is false', () => {
+  const transformed = transformProps(
+    makeChartProps(
+      { is_donut: false },
+      [{ foo: 'Sylvester', bar: 1, sum__num: 10 }],
+    ),
+  );
+  const series = transformed.echartOptions.series as PieSeriesOption[];
+  expect(series[0].radius).toEqual(['0%', '70%']);
+});
+
+test('Rose transformProps: should handle empty data', () => {
+  const transformed = transformProps(makeChartProps({}, []));
+  const series = transformed.echartOptions.series as PieSeriesOption[];
+  expect(series[0].data).toEqual([]);
+});
+
+test('Rose parseParams: should generate a valid label', () => {
+  const numberFormatter = getNumberFormatter();
+  const params = { name: 'My Label', value: 1234, percent: 12.34 };
+  expect(
+    parseParams({
+      params,
+      numberFormatter,
+    }),
+  ).toEqual(['My Label', '1.23k', '12.34%']);
+});
+
+test('Rose parseParams: should handle null-like names', () => {
+  const numberFormatter = getNumberFormatter();
+  const params = { name: '<NULL>', value: 1234, percent: 12.34 };
+  expect(
+    parseParams({
+      params,
+      numberFormatter,
+    }),
+  ).toEqual(['<NULL>', '1.23k', '12.34%']);
+});
+
+test('Rose parseParams: should sanitize HTML in name when sanitizeName is true', () => {
+  const numberFormatter = getNumberFormatter();
+  const params = { name: '<NULL>', value: 1234, percent: 12.34 };
+  expect(
+    parseParams({
+      params,
+      numberFormatter,
+      sanitizeName: true,
+    }),
+  ).toEqual(['&lt;NULL&gt;', '1.23k', '12.34%']);
+});
+
+const labelParams: CallbackDataParams = {
+  componentType: '',
+  componentSubType: '',
+  componentIndex: 0,
+  seriesType: 'pie',
+  seriesIndex: 0,
+  seriesId: 'seriesId',
+  seriesName: 'test',
+  name: 'Tablet',
+  dataIndex: 0,
+  data: {},
+  value: 123456,
+  percent: 55.5,
+  $vars: [],
+};
+
+function formatLabel(form: Partial<SqlaFormData>) {
+  const props = transformProps(makeChartProps(form));
+  const formatter = (props.echartOptions.series as PieSeriesOption[])[0]!
+    .label?.formatter;
+  return (formatter as LabelFormatterCallback)(labelParams);
+}
+
+test('Rose label formatting: should format label as key', () => {
+  expect(formatLabel({ label_type: 'key' })).toEqual('Tablet');
+});
+
+test('Rose label formatting: should format label as value', () => {
+  expect(formatLabel({ label_type: 'value' })).toEqual('123k');
+});
+
+test('Rose label formatting: should format label as percent', () => {
+  expect(formatLabel({ label_type: 'percent' })).toEqual('55.50%');
+});
+
+test('Rose label formatting: should format label as key_value', () => {
+  expect(formatLabel({ label_type: 'key_value' })).toEqual('Tablet: 123k');
+});
+
+test('Rose label formatting: should format label as key_percent', () => {
+  expect(formatLabel({ label_type: 'key_percent' })).toEqual(
+    'Tablet: 55.50%',
+  );
+});
+
+test('Rose label formatting: should format label as key_value_percent', () => {
+  expect(formatLabel({ label_type: 'key_value_percent' })).toEqual(
+    'Tablet: 123k (55.50%)',
+  );
+});
+
+const legendSortFormData: SqlaFormData = {
+  colorScheme: 'bnbColors',
+  datasource: '3__table',
+  granularity_sqla: 'ds',
+  metric: 'metric',
+  groupby: ['foo', 'bar'],
+  viz_type: 'rose',
+};
+
+const legendSortData = [
+  { foo: 'A foo', bar: 'A bar', metric: 1 },
+  { foo: 'D foo', bar: 'D bar', metric: 2 },
+  { foo: 'C foo', bar: 'C bar', metric: 3 },
+  { foo: 'B foo', bar: 'B bar', metric: 4 },
+  { foo: 'E foo', bar: 'E bar', metric: 5 },
+];
+
+function makeLegendSortChartProps(
+  formOverrides: Partial<SqlaFormData>,
+): EchartsRoseChartProps {
+  return new ChartProps({
+    formData: { ...legendSortFormData, ...formOverrides },
+    width: 800,
+    height: 600,
+    queriesData: [{ data: legendSortData }],
+    theme: supersetTheme,
+  }) as EchartsRoseChartProps;
+}
+
+test('Rose legend sorting: sort legend by data order when legendSort is null', () => {
+  const transformed = transformProps(
+    makeLegendSortChartProps({ legendSort: null }),
+  );
+  expect((transformed.echartOptions.legend as any).data).toEqual([
+    'A foo, A bar',
+    'D foo, D bar',
+    'C foo, C bar',
+    'B foo, B bar',
+    'E foo, E bar',
+  ]);
+});
+
+test('Rose legend sorting: sort legend by label ascending', () => {
+  const transformed = transformProps(
+    makeLegendSortChartProps({ legendSort: 'asc' }),
+  );
+  expect((transformed.echartOptions.legend as any).data).toEqual([
+    'A foo, A bar',
+    'B foo, B bar',
+    'C foo, C bar',
+    'D foo, D bar',
+    'E foo, E bar',
+  ]);
+});
+
+test('Rose legend sorting: sort legend by label descending', () => {
+  const transformed = transformProps(
+    makeLegendSortChartProps({ legendSort: 'desc' }),
+  );
+  expect((transformed.echartOptions.legend as any).data).toEqual([
+    'E foo, E bar',
+    'D foo, D bar',
+    'C foo, C bar',
+    'B foo, B bar',
+    'A foo, A bar',
+  ]);
+});
+
+const legendVisFormData: SqlaFormData = {
+  colorScheme: 'bnbColors',
+  datasource: '3__table',
+  granularity_sqla: 'ds',
+  metric: 'sum__num',
+  groupby: ['foo'],
+  viz_type: 'rose',
+};
+
+test('Rose legend visibility: should show legend when showLegend is true', () => {
+  const chartProps = new ChartProps({
+    formData: { ...legendVisFormData, show_legend: true },
+    width: 800,
+    height: 600,
+    queriesData: [{ data: [{ foo: 'A', sum__num: 10 }] }],
     theme: supersetTheme,
   });
-
-  test('should transform chart props for viz', () => {
-    const transformed = transformProps(chartProps as EchartsRoseChartProps);
-    expect(transformed).toEqual(
-      expect.objectContaining({
-        width: 800,
-        height: 600,
-        echartOptions: expect.objectContaining({
-          series: [
-            expect.objectContaining({
-              type: 'pie',
-              roseType: 'radius',
-              avoidLabelOverlap: true,
-              data: expect.arrayContaining([
-                expect.objectContaining({
-                  name: 'Sylvester, 1',
-                  value: 10,
-                }),
-                expect.objectContaining({
-                  name: 'Arnold, 2',
-                  value: 2.5,
-                }),
-              ]),
-            }),
-          ],
-        }),
-      }),
-    );
-  });
-
-  test('should use area roseType when useAreaProportions is true', () => {
-    const areaFormData: SqlaFormData = {
-      ...formData,
-      use_area_proportions: true,
-    };
-    const areaChartProps = new ChartProps({
-      formData: areaFormData,
-      width: 800,
-      height: 600,
-      queriesData: [
-        {
-          data: [
-            { foo: 'Sylvester', bar: 1, sum__num: 10 },
-            { foo: 'Arnold', bar: 2, sum__num: 2.5 },
-          ],
-        },
-      ],
-      theme: supersetTheme,
-    });
-    const transformed = transformProps(
-      areaChartProps as EchartsRoseChartProps,
-    );
-    const series = transformed.echartOptions.series as PieSeriesOption[];
-    expect(series[0].roseType).toBe('area');
-  });
-
-  test('should use radius roseType when useAreaProportions is false', () => {
-    const radiusFormData: SqlaFormData = {
-      ...formData,
-      use_area_proportions: false,
-    };
-    const radiusChartProps = new ChartProps({
-      formData: radiusFormData,
-      width: 800,
-      height: 600,
-      queriesData: [
-        {
-          data: [
-            { foo: 'Sylvester', bar: 1, sum__num: 10 },
-            { foo: 'Arnold', bar: 2, sum__num: 2.5 },
-          ],
-        },
-      ],
-      theme: supersetTheme,
-    });
-    const transformed = transformProps(
-      radiusChartProps as EchartsRoseChartProps,
-    );
-    const series = transformed.echartOptions.series as PieSeriesOption[];
-    expect(series[0].roseType).toBe('radius');
-  });
-
-  test('should return labelMap', () => {
-    const transformed = transformProps(chartProps as EchartsRoseChartProps);
-    expect(transformed.labelMap).toEqual({
-      'Sylvester, 1': ['Sylvester', 1],
-      'Arnold, 2': ['Arnold', 2],
-    });
-  });
-
-  test('should have donut shape when isDonut is true', () => {
-    const donutFormData: SqlaFormData = {
-      ...formData,
-      is_donut: true,
-      innerRadius: 40,
-    };
-    const donutChartProps = new ChartProps({
-      formData: donutFormData,
-      width: 800,
-      height: 600,
-      queriesData: [
-        {
-          data: [
-            { foo: 'Sylvester', bar: 1, sum__num: 10 },
-          ],
-        },
-      ],
-      theme: supersetTheme,
-    });
-    const transformed = transformProps(
-      donutChartProps as EchartsRoseChartProps,
-    );
-    const series = transformed.echartOptions.series as PieSeriesOption[];
-    expect(series[0].radius).toEqual(['40%', '70%']);
-  });
-
-  test('should have filled shape when isDonut is false', () => {
-    const filledFormData: SqlaFormData = {
-      ...formData,
-      is_donut: false,
-    };
-    const filledChartProps = new ChartProps({
-      formData: filledFormData,
-      width: 800,
-      height: 600,
-      queriesData: [
-        {
-          data: [
-            { foo: 'Sylvester', bar: 1, sum__num: 10 },
-          ],
-        },
-      ],
-      theme: supersetTheme,
-    });
-    const transformed = transformProps(
-      filledChartProps as EchartsRoseChartProps,
-    );
-    const series = transformed.echartOptions.series as PieSeriesOption[];
-    expect(series[0].radius).toEqual(['0%', '70%']);
-  });
-
-  test('should handle empty data', () => {
-    const emptyChartProps = new ChartProps({
-      formData,
-      width: 800,
-      height: 600,
-      queriesData: [{ data: [] }],
-      theme: supersetTheme,
-    });
-    const transformed = transformProps(
-      emptyChartProps as EchartsRoseChartProps,
-    );
-    const series = transformed.echartOptions.series as PieSeriesOption[];
-    expect(series[0].data).toEqual([]);
-  });
+  const transformed = transformProps(chartProps as EchartsRoseChartProps);
+  expect((transformed.echartOptions.legend as any).show).toBe(true);
 });
 
-describe('Rose parseParams', () => {
-  test('should generate a valid label', () => {
-    const numberFormatter = getNumberFormatter();
-    const params = { name: 'My Label', value: 1234, percent: 12.34 };
-    expect(
-      parseParams({
-        params,
-        numberFormatter,
-      }),
-    ).toEqual(['My Label', '1.23k', '12.34%']);
+test('Rose legend visibility: should hide legend when showLegend is false', () => {
+  const chartProps = new ChartProps({
+    formData: { ...legendVisFormData, show_legend: false },
+    width: 800,
+    height: 600,
+    queriesData: [{ data: [{ foo: 'A', sum__num: 10 }] }],
+    theme: supersetTheme,
   });
-
-  test('should handle null-like names', () => {
-    const numberFormatter = getNumberFormatter();
-    const params = { name: '<NULL>', value: 1234, percent: 12.34 };
-    expect(
-      parseParams({
-        params,
-        numberFormatter,
-      }),
-    ).toEqual(['<NULL>', '1.23k', '12.34%']);
-  });
-
-  test('should sanitize HTML in name when sanitizeName is true', () => {
-    const numberFormatter = getNumberFormatter();
-    const params = { name: '<NULL>', value: 1234, percent: 12.34 };
-    expect(
-      parseParams({
-        params,
-        numberFormatter,
-        sanitizeName: true,
-      }),
-    ).toEqual(['&lt;NULL&gt;', '1.23k', '12.34%']);
-  });
-});
-
-describe('Rose label formatting', () => {
-  const params: CallbackDataParams = {
-    componentType: '',
-    componentSubType: '',
-    componentIndex: 0,
-    seriesType: 'pie',
-    seriesIndex: 0,
-    seriesId: 'seriesId',
-    seriesName: 'test',
-    name: 'Tablet',
-    dataIndex: 0,
-    data: {},
-    value: 123456,
-    percent: 55.5,
-    $vars: [],
-  };
-
-  const getChartProps = (
-    form: Partial<SqlaFormData>,
-  ): EchartsRoseChartProps => {
-    const formData: SqlaFormData = {
-      colorScheme: 'bnbColors',
-      datasource: '3__table',
-      granularity_sqla: 'ds',
-      metric: 'sum__num',
-      groupby: ['foo', 'bar'],
-      viz_type: 'rose',
-      ...form,
-    };
-
-    return new ChartProps({
-      formData,
-      width: 800,
-      height: 600,
-      queriesData: [
-        {
-          data: [
-            { foo: 'Sylvester', bar: 1, sum__num: 10 },
-            { foo: 'Arnold', bar: 2, sum__num: 2.5 },
-          ],
-        },
-      ],
-      theme: supersetTheme,
-    }) as EchartsRoseChartProps;
-  };
-
-  const format = (form: Partial<SqlaFormData>) => {
-    const props = transformProps(getChartProps(form));
-    const formatter = (props.echartOptions.series as PieSeriesOption[])[0]!
-      .label?.formatter;
-
-    return (formatter as LabelFormatterCallback)(params);
-  };
-
-  test('should format label as key', () => {
-    expect(format({ label_type: 'key' })).toEqual('Tablet');
-  });
-
-  test('should format label as value', () => {
-    expect(format({ label_type: 'value' })).toEqual('123k');
-  });
-
-  test('should format label as percent', () => {
-    expect(format({ label_type: 'percent' })).toEqual('55.50%');
-  });
-
-  test('should format label as key_value', () => {
-    expect(format({ label_type: 'key_value' })).toEqual('Tablet: 123k');
-  });
-
-  test('should format label as key_percent', () => {
-    expect(format({ label_type: 'key_percent' })).toEqual(
-      'Tablet: 55.50%',
-    );
-  });
-
-  test('should format label as key_value_percent', () => {
-    expect(format({ label_type: 'key_value_percent' })).toEqual(
-      'Tablet: 123k (55.50%)',
-    );
-  });
-});
-
-describe('Rose legend sorting', () => {
-  const defaultFormData: SqlaFormData = {
-    colorScheme: 'bnbColors',
-    datasource: '3__table',
-    granularity_sqla: 'ds',
-    metric: 'metric',
-    groupby: ['foo', 'bar'],
-    viz_type: 'rose',
-  };
-
-  const getChartProps = (formData: Partial<SqlaFormData>) =>
-    new ChartProps({
-      formData: {
-        ...defaultFormData,
-        ...formData,
-      },
-      width: 800,
-      height: 600,
-      queriesData: [
-        {
-          data: [
-            { foo: 'A foo', bar: 'A bar', metric: 1 },
-            { foo: 'D foo', bar: 'D bar', metric: 2 },
-            { foo: 'C foo', bar: 'C bar', metric: 3 },
-            { foo: 'B foo', bar: 'B bar', metric: 4 },
-            { foo: 'E foo', bar: 'E bar', metric: 5 },
-          ],
-        },
-      ],
-      theme: supersetTheme,
-    });
-
-  test('sort legend by data order when legendSort is null', () => {
-    const chartProps = getChartProps({ legendSort: null });
-    const transformed = transformProps(
-      chartProps as EchartsRoseChartProps,
-    );
-
-    expect((transformed.echartOptions.legend as any).data).toEqual([
-      'A foo, A bar',
-      'D foo, D bar',
-      'C foo, C bar',
-      'B foo, B bar',
-      'E foo, E bar',
-    ]);
-  });
-
-  test('sort legend by label ascending', () => {
-    const chartProps = getChartProps({ legendSort: 'asc' });
-    const transformed = transformProps(
-      chartProps as EchartsRoseChartProps,
-    );
-
-    expect((transformed.echartOptions.legend as any).data).toEqual([
-      'A foo, A bar',
-      'B foo, B bar',
-      'C foo, C bar',
-      'D foo, D bar',
-      'E foo, E bar',
-    ]);
-  });
-
-  test('sort legend by label descending', () => {
-    const chartProps = getChartProps({ legendSort: 'desc' });
-    const transformed = transformProps(
-      chartProps as EchartsRoseChartProps,
-    );
-
-    expect((transformed.echartOptions.legend as any).data).toEqual([
-      'E foo, E bar',
-      'D foo, D bar',
-      'C foo, C bar',
-      'B foo, B bar',
-      'A foo, A bar',
-    ]);
-  });
-});
-
-describe('Rose legend visibility', () => {
-  const formData: SqlaFormData = {
-    colorScheme: 'bnbColors',
-    datasource: '3__table',
-    granularity_sqla: 'ds',
-    metric: 'sum__num',
-    groupby: ['foo'],
-    viz_type: 'rose',
-  };
-
-  test('should show legend when showLegend is true', () => {
-    const chartProps = new ChartProps({
-      formData: { ...formData, show_legend: true },
-      width: 800,
-      height: 600,
-      queriesData: [
-        { data: [{ foo: 'A', sum__num: 10 }] },
-      ],
-      theme: supersetTheme,
-    });
-    const transformed = transformProps(
-      chartProps as EchartsRoseChartProps,
-    );
-    expect((transformed.echartOptions.legend as any).show).toBe(true);
-  });
-
-  test('should hide legend when showLegend is false', () => {
-    const chartProps = new ChartProps({
-      formData: { ...formData, show_legend: false },
-      width: 800,
-      height: 600,
-      queriesData: [
-        { data: [{ foo: 'A', sum__num: 10 }] },
-      ],
-      theme: supersetTheme,
-    });
-    const transformed = transformProps(
-      chartProps as EchartsRoseChartProps,
-    );
-    expect((transformed.echartOptions.legend as any).show).toBe(false);
-  });
+  const transformed = transformProps(chartProps as EchartsRoseChartProps);
+  expect((transformed.echartOptions.legend as any).show).toBe(false);
 });

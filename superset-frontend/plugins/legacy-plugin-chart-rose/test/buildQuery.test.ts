@@ -18,37 +18,35 @@
  */
 import buildQuery from '../src/buildQuery';
 
-describe('Rose buildQuery', () => {
-  const formData = {
-    datasource: '5__table',
-    granularity_sqla: 'ds',
-    metric: 'foo',
-    groupby: ['bar'],
-    viz_type: 'rose',
-  };
+const formData = {
+  datasource: '5__table',
+  granularity_sqla: 'ds',
+  metric: 'foo',
+  groupby: ['bar'],
+  viz_type: 'rose',
+};
 
-  test('should build query fields from form data', () => {
-    const queryContext = buildQuery(formData);
-    const [query] = queryContext.queries;
-    expect(query.metrics).toEqual(['foo']);
-    expect(query.columns).toEqual(['bar']);
-  });
+test('Rose buildQuery: should build query fields from form data', () => {
+  const queryContext = buildQuery(formData);
+  const [query] = queryContext.queries;
+  expect(query.metrics).toEqual(['foo']);
+  expect(query.columns).toEqual(['bar']);
+});
 
-  test('should order by metric when sort_by_metric is true', () => {
-    const queryContext = buildQuery({
-      ...formData,
-      sort_by_metric: true,
-    });
-    const [query] = queryContext.queries;
-    expect(query.orderby).toEqual([['foo', false]]);
+test('Rose buildQuery: should order by metric when sort_by_metric is true', () => {
+  const queryContext = buildQuery({
+    ...formData,
+    sort_by_metric: true,
   });
+  const [query] = queryContext.queries;
+  expect(query.orderby).toEqual([['foo', false]]);
+});
 
-  test('should not order by metric when sort_by_metric is false', () => {
-    const queryContext = buildQuery({
-      ...formData,
-      sort_by_metric: false,
-    });
-    const [query] = queryContext.queries;
-    expect(query.orderby).toBeUndefined();
+test('Rose buildQuery: should not order by metric when sort_by_metric is false', () => {
+  const queryContext = buildQuery({
+    ...formData,
+    sort_by_metric: false,
   });
+  const [query] = queryContext.queries;
+  expect(query.orderby).toBeUndefined();
 });

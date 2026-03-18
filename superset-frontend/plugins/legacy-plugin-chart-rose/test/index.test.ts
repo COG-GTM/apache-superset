@@ -18,27 +18,25 @@
  */
 import RoseChartPlugin from '../src';
 
-describe('RoseChartPlugin', () => {
-  test('should create a new instance', () => {
-    const plugin = new RoseChartPlugin();
-    expect(plugin).toBeDefined();
-  });
+test('RoseChartPlugin: should create a new instance', () => {
+  const plugin = new RoseChartPlugin();
+  expect(plugin).toBeDefined();
+});
 
-  test('should have correct metadata', () => {
-    const plugin = new RoseChartPlugin();
-    const metadata = plugin.metadata;
-    expect(metadata).toBeDefined();
-    expect(metadata?.name).toBeTruthy();
-    expect(metadata?.credits).toEqual(['https://echarts.apache.org']);
-  });
+test('RoseChartPlugin: should have correct metadata', () => {
+  const plugin = new RoseChartPlugin();
+  const metadata = plugin.metadata;
+  expect(metadata).toBeDefined();
+  expect(metadata?.name).toBeTruthy();
+  expect(metadata?.credits).toEqual(['https://echarts.apache.org']);
+});
 
-  test('should have buildQuery', () => {
-    const plugin = new RoseChartPlugin();
-    expect(plugin.loadBuildQuery).toBeDefined();
-  });
+test('RoseChartPlugin: should have buildQuery', () => {
+  const plugin = new RoseChartPlugin();
+  expect(plugin.loadBuildQuery).toBeDefined();
+});
 
-  test('should have transformProps', () => {
-    const plugin = new RoseChartPlugin();
-    expect(plugin.loadTransformProps).toBeDefined();
-  });
+test('RoseChartPlugin: should have transformProps', () => {
+  const plugin = new RoseChartPlugin();
+  expect(plugin.loadTransformProps).toBeDefined();
 });
