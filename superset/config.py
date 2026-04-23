@@ -352,10 +352,12 @@ AUTH_RATE_LIMIT = "5 per second"
 # ------------------------------
 # GLOBALS FOR APP Builder
 # ------------------------------
-# Uncomment to setup Your App name
-APP_NAME = "Superset"
+# Custom branding for COG-GTM
+APP_NAME = "COG-GTM Superset"
 
 # Specify the App icon
+# APP_ICON can be set to a custom logo path, e.g.:
+# APP_ICON = "/static/assets/images/cog-gtm-logo.png"
 APP_ICON = "/static/assets/images/superset-logo-horiz.png"
 
 # Specify where clicking the logo would take the user'
