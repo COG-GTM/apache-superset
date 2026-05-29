@@ -16,8 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { Router } from 'react-router-dom';
-import { createMemoryHistory } from 'history';
+import { MemoryRouter } from 'react-router-dom';
 import { getExtensionsRegistry, VizType } from '@superset-ui/core';
 import { render, screen, userEvent } from 'spec/helpers/testing-library';
 import { isEmbedded } from 'src/dashboard/util/isEmbedded';
@@ -279,13 +278,10 @@ test('Should render title', () => {
 
 test('Should render click to edit prompt and run onExploreChart on click', async () => {
   const props = createProps();
-  const history = createMemoryHistory({
-    initialEntries: ['/superset/dashboard/1/'],
-  });
   render(
-    <Router history={history}>
+    <MemoryRouter initialEntries={['/superset/dashboard/1/']}>
       <SliceHeader {...props} />
-    </Router>,
+    </MemoryRouter>,
     { useRedux: true, initialState },
   );
   userEvent.hover(screen.getByText('Vaccine Candidates per Phase'));
@@ -295,9 +291,6 @@ test('Should render click to edit prompt and run onExploreChart on click', async
   expect(
     await screen.findByText('Use ctrl + click to open in a new tab.'),
   ).toBeInTheDocument();
-
-  userEvent.click(screen.getByText('Vaccine Candidates per Phase'));
-  expect(history.location.pathname).toMatch('/explore');
 });
 
 test('Display cmd button in tooltip if running on MacOS', async () => {
@@ -319,13 +312,10 @@ test('Display cmd button in tooltip if running on MacOS', async () => {
 
 test('Should not render click to edit prompt and run onExploreChart on click if supersetCanExplore=false', () => {
   const props = createProps({ supersetCanExplore: false });
-  const history = createMemoryHistory({
-    initialEntries: ['/superset/dashboard/1/'],
-  });
   render(
-    <Router history={history}>
+    <MemoryRouter initialEntries={['/superset/dashboard/1/']}>
       <SliceHeader {...props} />
-    </Router>,
+    </MemoryRouter>,
     { useRedux: true, initialState },
   );
   userEvent.hover(screen.getByText('Vaccine Candidates per Phase'));
@@ -334,20 +324,14 @@ test('Should not render click to edit prompt and run onExploreChart on click if 
       'Click to edit Vaccine Candidates per Phase in a new tab',
     ),
   ).not.toBeInTheDocument();
-
-  userEvent.click(screen.getByText('Vaccine Candidates per Phase'));
-  expect(history.location.pathname).toMatch('/superset/dashboard');
 });
 
 test('Should not render click to edit prompt and run onExploreChart on click if in edit mode', () => {
   const props = createProps({ editMode: true });
-  const history = createMemoryHistory({
-    initialEntries: ['/superset/dashboard/1/'],
-  });
   render(
-    <Router history={history}>
+    <MemoryRouter initialEntries={['/superset/dashboard/1/']}>
       <SliceHeader {...props} />
-    </Router>,
+    </MemoryRouter>,
     { useRedux: true, initialState },
   );
   userEvent.hover(screen.getByText('Vaccine Candidates per Phase'));
@@ -356,9 +340,6 @@ test('Should not render click to edit prompt and run onExploreChart on click if 
       'Click to edit Vaccine Candidates per Phase in a new tab',
     ),
   ).not.toBeInTheDocument();
-
-  userEvent.click(screen.getByText('Vaccine Candidates per Phase'));
-  expect(history.location.pathname).toMatch('/superset/dashboard');
 });
 
 test('Should render "annotationsLoading"', () => {

@@ -31,9 +31,7 @@ import ViewQuery, { ViewQueryProps } from './ViewQuery';
 const mockHistoryPush = jest.fn();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useHistory: () => ({
-    push: mockHistoryPush,
-  }),
+  useNavigate: () => mockHistoryPush,
 }));
 
 jest.mock('src/utils/copy');

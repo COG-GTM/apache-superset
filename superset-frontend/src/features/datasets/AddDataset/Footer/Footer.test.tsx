@@ -27,9 +27,7 @@ import Footer from 'src/features/datasets/AddDataset/Footer';
 const mockHistoryPush = jest.fn();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useHistory: () => ({
-    push: mockHistoryPush,
-  }),
+  useNavigate: () => mockHistoryPush,
 }));
 
 // Mock the API call

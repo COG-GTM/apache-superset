@@ -28,7 +28,7 @@ import {
 
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { pick } from 'lodash';
 import {
   Button,
@@ -227,7 +227,7 @@ const ResultSet = ({
     [query.results?.expanded_columns],
   );
 
-  const history = useHistory();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const logAction = useLogAction({ queryId, sqlEditorId: query.sqlEditorId });
   const { showConfirm, ConfirmModal } = useConfirmModal();
@@ -309,7 +309,7 @@ const ResultSet = ({
       if (openInNewWindow) {
         window.open(url, '_blank', 'noreferrer');
       } else {
-        history.push(url);
+        navigate(url);
       }
     } else {
       addDangerToast(t('Unable to create chart without a query id.'));

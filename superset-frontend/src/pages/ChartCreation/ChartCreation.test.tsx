@@ -24,7 +24,6 @@ import {
   waitFor,
 } from 'spec/helpers/testing-library';
 import fetchMock from 'fetch-mock';
-import { createMemoryHistory } from 'history';
 import { ChartCreation } from 'src/pages/ChartCreation';
 import { UserWithPermissionsAndRoles } from 'src/types/bootstrapTypes';
 import { supersetTheme } from '@apache-superset/core/theme';
@@ -78,14 +77,31 @@ const mockUserWithDatasetWrite: UserWithPermissionsAndRoles = {
   username: 'admin',
   isAnonymous: false,
 };
-const history = createMemoryHistory();
+const mockNavigate = jest.fn();
 
-history.push = jest.fn();
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => mockNavigate,
+  useLocation: () => ({
+    pathname: '/',
+    search: '',
+    hash: '',
+    state: null,
+    key: 'default',
+  }),
+  useParams: () => ({}),
+}));
 
 const routeProps = {
-  history,
-  location: {} as any,
-  match: {} as any,
+  navigate: mockNavigate,
+  location: {
+    pathname: '/',
+    search: '',
+    hash: '',
+    state: null,
+    key: 'default',
+  } as any,
+  params: {},
 };
 
 async function renderComponent(user = mockUser) {
@@ -169,7 +185,7 @@ test('double-click viz type does nothing if no datasource is selected', async ()
   expect(
     screen.getByRole('button', { name: 'Create new chart' }),
   ).toBeDisabled();
-  expect(history.push).not.toHaveBeenCalled();
+  expect(mockNavigate).not.toHaveBeenCalled();
 });
 
 test('double-click viz type submits with formatted URL if datasource is selected', async () => {
@@ -191,7 +207,7 @@ test('double-click viz type submits with formatted URL if datasource is selected
     screen.getByRole('button', { name: 'Create new chart' }),
   ).toBeEnabled();
   const formattedUrl = '/explore/?viz_type=table&datasource=table_1__table';
-  expect(history.push).toHaveBeenCalledWith(formattedUrl);
+  expect(mockNavigate).toHaveBeenCalledWith(formattedUrl);
 });
 
 test('dropdown displays matching datasets when user types a search term', async () => {

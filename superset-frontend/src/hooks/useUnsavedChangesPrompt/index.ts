@@ -19,9 +19,8 @@
 import { t } from '@apache-superset/core/translation';
 import { getClientErrorObject } from '@superset-ui/core';
 import { useEffect, useRef, useCallback, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useBlocker } from 'react-router-dom';
 import { useBeforeUnload } from 'src/hooks/useBeforeUnload';
-import type { Location } from 'history';
 
 type UseUnsavedChangesPromptProps = {
   hasUnsavedChanges: boolean;
@@ -36,17 +35,28 @@ export const useUnsavedChangesPrompt = ({
   isSaveModalVisible = false,
   manualSaveOnUnsavedChanges = false,
 }: UseUnsavedChangesPromptProps) => {
-  const history = useHistory();
   const [showModal, setShowModal] = useState(false);
+  const manualSaveRef = useRef(false);
 
-  const confirmNavigationRef = useRef<(() => void) | null>(null);
-  const unblockRef = useRef<() => void>(() => {});
-  const manualSaveRef = useRef(false); // Track if save was user-initiated (not via navigation)
+  const blocker = useBlocker(
+    ({ currentLocation, nextLocation }) =>
+      hasUnsavedChanges &&
+      !manualSaveRef.current &&
+      currentLocation.pathname !== nextLocation.pathname,
+  );
+
+  useEffect(() => {
+    if (blocker.state === 'blocked') {
+      setShowModal(true);
+    }
+  }, [blocker.state]);
 
   const handleConfirmNavigation = useCallback(() => {
     setShowModal(false);
-    confirmNavigationRef.current?.();
-  }, []);
+    if (blocker.state === 'blocked') {
+      blocker.proceed();
+    }
+  }, [blocker]);
 
   const handleSaveAndCloseModal = useCallback(async () => {
     try {
@@ -54,6 +64,9 @@ export const useUnsavedChangesPrompt = ({
 
       await onSave();
       setShowModal(false);
+      if (blocker.state === 'blocked') {
+        blocker.proceed();
+      }
     } catch (err) {
       const clientError = await getClientErrorObject(err);
       throw new Error(
@@ -63,45 +76,12 @@ export const useUnsavedChangesPrompt = ({
         { cause: err },
       );
     }
-  }, [manualSaveOnUnsavedChanges, onSave]);
+  }, [manualSaveOnUnsavedChanges, onSave, blocker]);
 
   const triggerManualSave = useCallback(() => {
     manualSaveRef.current = true;
     onSave();
   }, [onSave]);
-
-  const blockCallback = useCallback(
-    ({
-      pathname,
-      state,
-    }: {
-      pathname: Location['pathname'];
-      state: Location['state'];
-    }) => {
-      if (manualSaveRef.current) {
-        manualSaveRef.current = false;
-        return undefined;
-      }
-
-      confirmNavigationRef.current = () => {
-        unblockRef.current?.();
-        history.push(pathname, state);
-      };
-
-      setShowModal(true);
-      return false;
-    },
-    [history],
-  );
-
-  useEffect(() => {
-    if (!hasUnsavedChanges) return undefined;
-
-    const unblock = history.block(blockCallback);
-    unblockRef.current = unblock;
-
-    return () => unblock();
-  }, [blockCallback, hasUnsavedChanges, history]);
 
   useEffect(() => {
     if (!isSaveModalVisible && manualSaveRef.current) {

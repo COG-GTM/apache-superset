@@ -20,7 +20,7 @@ import { t } from '@apache-superset/core/translation';
 import { getExtensionsRegistry, SupersetClient } from '@superset-ui/core';
 import { styled, useTheme, css } from '@apache-superset/core/theme';
 import { FunctionComponent, useState, useMemo, useCallback, Key } from 'react';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import rison from 'rison';
 import {
   createFetchRelated,
@@ -149,7 +149,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
   addSuccessToast,
   user,
 }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
   const theme = useTheme();
   const {
     state: {
@@ -688,7 +688,7 @@ const DatasetList: FunctionComponent<DatasetListProps> = ({
       icon: <Icons.PlusOutlined iconSize="m" />,
       name: t('Dataset'),
       onClick: () => {
-        history.push('/dataset/add/');
+        navigate('/dataset/add/');
       },
       buttonStyle: 'primary',
     });

@@ -19,7 +19,7 @@
 import { render, screen, within, waitFor } from 'spec/helpers/testing-library';
 import userEvent from '@testing-library/user-event';
 import { QueryParamProvider } from 'use-query-params';
-import { ReactRouter5Adapter } from 'use-query-params/adapters/react-router-5';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 import { MemoryRouter } from 'react-router-dom';
 import thunk from 'redux-thunk';
 import configureStore from 'redux-mock-store';
@@ -207,7 +207,7 @@ const factory = (overrides?: Partial<ListViewProps>) => {
   const props = { ...mockedPropsComprehensive, ...overrides };
   return render(
     <MemoryRouter>
-      <QueryParamProvider adapter={ReactRouter5Adapter}>
+      <QueryParamProvider adapter={ReactRouter6Adapter}>
         <ListView {...props} />
       </QueryParamProvider>
     </MemoryRouter>,
