@@ -26,7 +26,7 @@ import {
   SortableHandle,
   SortableElement,
   arrayMove,
-} from 'react-sortable-hoc';
+} from 'react-sortable-hoc'; // TODO: Replace react-sortable-hoc with @dnd-kit/sortable (uses findDOMNode, incompatible with React.StrictMode)
 import { Icons } from '@superset-ui/core/components/Icons';
 import {
   HeaderContainer,

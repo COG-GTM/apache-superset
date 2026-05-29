@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook, waitFor } from '@testing-library/react';
 import fetchMock from 'fetch-mock';
 import { useDashboard, useDashboardDatasets } from './dashboards';
 
@@ -31,8 +31,8 @@ test('useDashboard excludes thumbnail_url from request', async () => {
     },
   });
 
-  const { waitForNextUpdate } = renderHook(() => useDashboard(5));
-  await waitForNextUpdate();
+  const { result } = renderHook(() => useDashboard(5));
+  await waitFor(() => expect(result.current.result).toBeDefined());
 
   const calledUrl = fetchMock.callHistory.lastCall()?.url ?? '';
   expect(calledUrl).toContain('?q=');
@@ -82,10 +82,8 @@ describe('useDashboardDatasets', () => {
       result: mockDatasets,
     });
 
-    const { result, waitForNextUpdate } = renderHook(() =>
-      useDashboardDatasets(1),
-    );
-    await waitForNextUpdate();
+    const { result } = renderHook(() => useDashboardDatasets(1));
+    await waitFor(() => expect(result.current.result).toBeDefined());
 
     const expectedContent = [
       {

@@ -26,7 +26,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import ReactDOM from 'react-dom';
+import { createPortal } from 'react-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { t } from '@apache-superset/core/translation';
 import {
@@ -406,7 +406,7 @@ const ChartContextMenu = (
     [open],
   );
 
-  return ReactDOM.createPortal(
+  return createPortal(
     <>
       <Dropdown
         menu={{
