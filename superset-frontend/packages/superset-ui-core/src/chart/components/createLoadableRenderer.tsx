@@ -68,20 +68,20 @@ export default function createLoadableRenderer<
   const keys = Object.keys(loader) as (keyof Exports)[];
 
   let promise: Promise<Exports> | undefined;
+  let resolved: Exports | undefined;
 
   function loadAll(): Promise<Exports> {
     if (!promise) {
       promise = Promise.all(
         keys.map(key =>
-          Promise.resolve()
-            .then(() => loader[key]())
-            .then(module => resolveModule(module)),
+          Promise.resolve(loader[key]()).then(module => resolveModule(module)),
         ),
       ).then(values => {
         const loaded = {} as Exports;
         keys.forEach((key, index) => {
           loaded[key] = values[index];
         });
+        resolved = loaded;
         return loaded;
       });
     }
@@ -103,7 +103,11 @@ export default function createLoadableRenderer<
 
     constructor(props: Props & LoadableRendererProps) {
       super(props);
-      this.state = { loaded: undefined, loading: true, error: null };
+      // When the module has already been preloaded, initialize synchronously
+      // so the first render shows the loaded content without flashing Loading.
+      this.state = resolved
+        ? { loaded: resolved, loading: false, error: null }
+        : { loaded: undefined, loading: true, error: null };
     }
 
     componentDidMount() {
