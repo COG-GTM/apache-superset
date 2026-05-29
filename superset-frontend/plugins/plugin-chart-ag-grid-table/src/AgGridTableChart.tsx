@@ -21,6 +21,7 @@ import {
   DataRecord,
   DataRecordValue,
   getTimeFormatterForGranularity,
+  JsonObject,
 } from '@superset-ui/core';
 import { GenericDataType } from '@apache-superset/core/common';
 import { useCallback, useEffect, useState, useMemo } from 'react';
@@ -147,7 +148,7 @@ export default function TableChart<D extends DataRecord = DataRecord>(
   ]);
 
   const handleColumnStateChange = useCallback(
-    agGridState => {
+    (agGridState: JsonObject) => {
       if (onChartStateChange) {
         onChartStateChange(agGridState);
       }

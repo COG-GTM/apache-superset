@@ -30,7 +30,8 @@ import { getDashboardPermalink } from 'src/utils/urlUtils';
 import EmbedCodeContent from 'src/explore/components/EmbedCodeContent';
 import { ModalTrigger } from '@superset-ui/core/components';
 import { MenuKeys, RootState } from 'src/dashboard/types';
-import { shallowEqual, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { shallowEqual } from 'src/utils/shallowEqual';
 import { hasStatefulCharts } from 'src/dashboard/util/chartStateConverter';
 
 export interface ShareMenuItemProps extends ComponentProps<

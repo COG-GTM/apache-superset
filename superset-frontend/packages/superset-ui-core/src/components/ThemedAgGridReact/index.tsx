@@ -169,6 +169,7 @@ export type {
   GridReadyEvent,
   CellClickedEvent,
   CellClassParams,
+  ColumnHeaderClickedEvent,
   IMenuActionParams,
   IHeaderParams,
   SortModelItem,

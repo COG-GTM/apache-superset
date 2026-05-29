@@ -16,8 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { createRef, useCallback, useMemo } from 'react';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import {
+  createRef,
+  useCallback,
+  useMemo,
+  type MouseEvent as ReactMouseEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
+} from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'src/utils/shallowEqual';
 import { nanoid } from 'nanoid';
 import Tabs from '@superset-ui/core/components/Tabs';
 import { t } from '@apache-superset/core/translation';
@@ -140,7 +147,10 @@ const SouthPane = ({
     logAction(LOG_ACTIONS_SQLLAB_SWITCH_SOUTH_PANE_TAB, { tab: id });
   };
   const removeTable = useCallback(
-    (key, action) => {
+    (
+      key: ReactMouseEvent | ReactKeyboardEvent | string,
+      action: 'add' | 'remove',
+    ) => {
       if (action === 'remove') {
         const table = pinnedTables.find(
           ({ dbId, catalog, schema, name }) =>

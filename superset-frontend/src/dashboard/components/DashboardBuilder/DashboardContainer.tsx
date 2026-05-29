@@ -20,6 +20,7 @@
 // when its container size changes, due to e.g., builder side panel opening
 import {
   FC,
+  type FocusEvent as ReactFocusEvent,
   memo,
   useCallback,
   useEffect,
@@ -27,7 +28,8 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useDispatch, useSelector, shallowEqual } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'src/utils/shallowEqual';
 import { createSelector } from '@reduxjs/toolkit';
 import { isEqual } from 'lodash';
 import {
@@ -285,10 +287,10 @@ const DashboardContainer: FC<DashboardContainerProps> = ({ topLevelTabs }) => {
   }, [onBeforeUnload]);
 
   const renderTabBar = useCallback(() => <></>, []);
-  const handleFocus = useCallback(e => {
+  const handleFocus = useCallback((e: ReactFocusEvent<HTMLDivElement>) => {
     if (
       // prevent scrolling when tabbing to the tab pane
-      e.target.classList.contains('ant-tabs-tabpane') &&
+      (e.target as HTMLElement).classList.contains('ant-tabs-tabpane') &&
       window.scrollY < TOP_OF_PAGE_RANGE
     ) {
       // prevent window from jumping down when tabbing
@@ -299,7 +301,7 @@ const DashboardContainer: FC<DashboardContainerProps> = ({ topLevelTabs }) => {
   }, []);
 
   const renderParentSizeChildren = useCallback(
-    ({ width }) => {
+    ({ width }: { width: number }) => {
       const tabItems = childIds.map((id, index) => ({
         key: index === 0 ? DASHBOARD_GRID_ID : index.toString(),
         label: null,

@@ -20,8 +20,6 @@
 import { Component } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
-// @ts-expect-error
-import { createFilter } from 'react-search-input';
 import { t } from '@apache-superset/core/translation';
 import { styled, css } from '@apache-superset/core/theme';
 import {
@@ -85,6 +83,19 @@ type SliceAdderState = {
 };
 
 const KEYS_TO_FILTERS = ['slice_name', 'viz_type', 'datasource_name'];
+
+// Returns a predicate that keeps items where every whitespace-separated search
+// term is found (case-insensitive) in at least one of the provided keys.
+function createFilter(searchTerm: string, keys: string[]) {
+  const terms = searchTerm.toLowerCase().split(/\s+/).filter(Boolean);
+  return (item: Record<string, any>) =>
+    terms.every(term =>
+      keys.some(key => {
+        const value = item[key];
+        return typeof value === 'string' && value.toLowerCase().includes(term);
+      }),
+    );
+}
 const KEYS_TO_SORT = {
   slice_name: t('name'),
   viz_type: t('viz type'),

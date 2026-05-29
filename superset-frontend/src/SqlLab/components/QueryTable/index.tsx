@@ -30,7 +30,8 @@ import ProgressBar from '@superset-ui/core/components/ProgressBar';
 import { t } from '@apache-superset/core/translation';
 import { QueryResponse, QueryState } from '@superset-ui/core';
 import { useTheme } from '@apache-superset/core/theme';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'src/utils/shallowEqual';
 
 import {
   queryEditorSetSql,
@@ -50,7 +51,14 @@ import { StaticPosition, StyledTooltip, ModalResultSetWrapper } from './styles';
 
 interface QueryTableQuery extends Omit<
   QueryResponse,
-  'state' | 'sql' | 'progress' | 'results' | 'duration' | 'started'
+  | 'state'
+  | 'sql'
+  | 'progress'
+  | 'results'
+  | 'duration'
+  | 'started'
+  | 'user'
+  | 'db'
 > {
   state?: Record<string, any>;
   sql?: Record<string, any>;
@@ -58,6 +66,8 @@ interface QueryTableQuery extends Omit<
   results?: Record<string, any>;
   duration?: ReactNode;
   started?: ReactNode;
+  user?: ReactNode;
+  db?: ReactNode;
 }
 
 interface QueryTableProps {
@@ -250,7 +260,7 @@ const QueryTable = ({
     return queries
       .map(query => {
         const { state, sql, progress, ...rest } = query;
-        const q = rest as QueryTableQuery;
+        const q = rest as unknown as QueryTableQuery;
 
         const status = statusAttributes[state] || statusAttributes.error;
 

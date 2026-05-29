@@ -18,7 +18,8 @@
  */
 import { pick } from 'lodash';
 import { useMemo } from 'react';
-import { shallowEqual, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { shallowEqual } from 'src/utils/shallowEqual';
 import { SqlLabRootState, QueryEditor } from 'src/SqlLab/types';
 
 export default function useQueryEditor<T extends keyof QueryEditor>(

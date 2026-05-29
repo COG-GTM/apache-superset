@@ -17,7 +17,7 @@
  * under the License.
  */
 import { RefObject } from 'react';
-import { useDrag } from 'react-dnd';
+import { useDrag, DragSourceMonitor } from 'react-dnd';
 import { Metric } from '@superset-ui/core';
 import { css, styled, useTheme } from '@apache-superset/core/theme';
 import { ColumnMeta } from '@superset-ui/chart-controls';
@@ -71,11 +71,12 @@ export default function DatasourcePanelDragOption(
   const { labelRef, showTooltip, type, value } = props;
   const theme = useTheme();
   const [{ isDragging }, drag] = useDrag({
+    type: props.type,
     item: {
       value: props.value,
       type: props.type,
     },
-    collect: monitor => ({
+    collect: (monitor: DragSourceMonitor) => ({
       isDragging: monitor.isDragging(),
     }),
   });

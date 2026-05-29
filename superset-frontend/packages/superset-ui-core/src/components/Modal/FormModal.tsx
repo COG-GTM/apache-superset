@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { useState, useCallback } from 'react';
+import { useState, useCallback, type ReactNode } from 'react';
 import { t } from '@apache-superset/core/translation';
 import { Button } from '../Button';
 import { Form } from '../Form';
@@ -54,7 +54,7 @@ export function FormModal({
   }, [onSave, resetForm]);
 
   const handleFormSubmit = useCallback(
-    async values => {
+    async (values: Record<string, unknown>) => {
       try {
         setIsSaving(true);
         await formSubmitHandler(values);
@@ -113,7 +113,13 @@ export function FormModal({
         onValuesChange={onFormChange}
         onFieldsChange={onFormChange}
       >
-        {typeof children === 'function' ? children(form) : children}
+        {typeof children === 'function'
+          ? (
+              children as (
+                form: ReturnType<typeof Form.useForm>[0],
+              ) => ReactNode
+            )(form)
+          : children}
       </Form>
     </Modal>
   );

@@ -17,7 +17,8 @@
  * under the License.
  */
 import { FC, useMemo } from 'react';
-import { shallowEqual, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { shallowEqual } from 'src/utils/shallowEqual';
 import { EmptyState } from '@superset-ui/core/components';
 import { t } from '@apache-superset/core/translation';
 import { FeatureFlag, isFeatureEnabled } from '@superset-ui/core';

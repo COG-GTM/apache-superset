@@ -19,17 +19,19 @@
 
 import { useCallback } from 'react';
 import { useDispatch } from 'react-redux';
+import type { AnyAction } from 'redux';
+import type { ThunkDispatch } from 'redux-thunk';
 import { logEvent } from 'src/logger/actions';
 
 export default function useLogAction(staticEventData: Record<string, any>) {
-  const dispatch = useDispatch();
-  const logAction = useCallback<typeof logEvent>(
-    (type, payload) =>
+  const dispatch = useDispatch<ThunkDispatch<unknown, unknown, AnyAction>>();
+  const logAction = useCallback(
+    (eventName: string, eventData: Record<string, any>) =>
       dispatch(
-        logEvent(type, {
+        logEvent(eventName, {
           payload: {
             ...staticEventData,
-            ...payload,
+            ...eventData,
           },
         }),
       ),

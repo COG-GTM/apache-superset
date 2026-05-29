@@ -17,25 +17,25 @@
  * under the License.
  */
 import { getEmptyImage } from 'react-dnd-html5-backend';
-import {
-  ComponentType as ReactComponentType,
-  CSSProperties,
-  PureComponent,
-  ReactNode,
-} from 'react';
+import { CSSProperties, PureComponent, ReactNode, useRef } from 'react';
 import { TAB_TYPE } from 'src/dashboard/util/componentTypes';
 import {
-  DragSource,
-  DropTarget,
+  useDrag,
+  useDrop,
   ConnectDragSource,
   ConnectDragPreview,
   ConnectDropTarget,
+  DragSourceMonitor,
+  DropTargetMonitor,
 } from 'react-dnd';
 import cx from 'classnames';
 import { css, styled } from '@apache-superset/core/theme';
 
 import { dragConfig, dropConfig } from './dragDroppableConfig';
-import type { DragDroppableProps as BaseDragDroppableProps } from './dragDroppableConfig';
+import type {
+  DragDroppableProps as BaseDragDroppableProps,
+  DragItem,
+} from './dragDroppableConfig';
 import { DROP_FORBIDDEN } from '../../util/getDropPosition';
 import type { ComponentType } from '../../types';
 
@@ -281,19 +281,125 @@ export class UnwrappedDragDroppable extends PureComponent<
   }
 }
 
-// react-dnd's DragSource/DropTarget HOC types don't play well with
-// class components using spread config tuples, so we use type assertions here
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const DragDroppableAsAny =
-  UnwrappedDragDroppable as unknown as ReactComponentType<
-    Record<string, unknown>
-  >;
+// The legacy react-dnd decorator HOCs (DragSource/DropTarget) erased the public
+// prop types of these wrappers by casting the wrapped component to
+// `Record<string, unknown>`, so consumers pass loosely-typed props. Preserve
+// that external contract to keep this a behavior-only migration;
+// `UnwrappedDragDroppable` remains strongly typed for internal use and tests.
+type DragDroppablePublicProps = Record<string, unknown>;
 
-export const Draggable = DragSource(...dragConfig)(DragDroppableAsAny);
-export const Droppable = DropTarget(...dropConfig)(DragDroppableAsAny);
+const withDefaults = (props: DragDroppablePublicProps): DragDroppableOwnProps =>
+  ({
+    disableDragDrop: false,
+    ...props,
+  }) as unknown as DragDroppableOwnProps;
 
-// note that the composition order here determines using
-// component.method() vs decoratedComponentInstance.method() in the drag/drop config
-export const DragDroppable = DragSource(...dragConfig)(
-  DropTarget(...dropConfig)(DragDroppableAsAny),
-);
+const collectDrag = (monitor: DragSourceMonitor) => ({
+  isDragging: monitor.isDragging(),
+  dragComponentType: (monitor.getItem() as DragItem | null)?.type,
+  dragComponentId: (monitor.getItem() as DragItem | null)?.id,
+});
+
+const collectDrop = (monitor: DropTargetMonitor) => ({
+  isDraggingOver: monitor.isOver(),
+  isDraggingOverShallow: monitor.isOver({ shallow: true }),
+});
+
+function useDragSpec(props: DragDroppableOwnProps) {
+  return useDrag({
+    type: dragConfig[0],
+    canDrag: () => dragConfig[1].canDrag(props),
+    item: () => dragConfig[1].beginDrag(props),
+    collect: collectDrag,
+  });
+}
+
+function useDropSpec(
+  props: DragDroppableOwnProps,
+  componentRef: { current: UnwrappedDragDroppable | null },
+) {
+  return useDrop({
+    accept: dropConfig[0],
+    canDrop: () => dropConfig[1].canDrop(props),
+    hover: (_item: DragItem, monitor: DropTargetMonitor) => {
+      const component = componentRef.current;
+      if (component) {
+        dropConfig[1].hover(props, monitor, component);
+      }
+    },
+    drop: (_item: DragItem, monitor: DropTargetMonitor) => {
+      const component = componentRef.current;
+      return component
+        ? dropConfig[1].drop(props, monitor, component)
+        : undefined;
+    },
+    collect: collectDrop,
+  });
+}
+
+export function Draggable(rawProps: DragDroppablePublicProps) {
+  const props = withDefaults(rawProps);
+  const componentRef = useRef<UnwrappedDragDroppable>(null);
+  const [
+    { isDragging, dragComponentType, dragComponentId },
+    dragSourceRef,
+    dragPreviewRef,
+  ] = useDragSpec(props);
+  return (
+    <UnwrappedDragDroppable
+      ref={componentRef}
+      {...props}
+      isDragging={isDragging}
+      dragComponentType={dragComponentType}
+      dragComponentId={dragComponentId}
+      dragSourceRef={dragSourceRef}
+      dragPreviewRef={dragPreviewRef}
+    />
+  );
+}
+
+export function Droppable(rawProps: DragDroppablePublicProps) {
+  const props = withDefaults(rawProps);
+  const componentRef = useRef<UnwrappedDragDroppable>(null);
+  const [{ isDraggingOver, isDraggingOverShallow }, droppableRef] = useDropSpec(
+    props,
+    componentRef,
+  );
+  return (
+    <UnwrappedDragDroppable
+      ref={componentRef}
+      {...props}
+      isDraggingOver={isDraggingOver}
+      isDraggingOverShallow={isDraggingOverShallow}
+      droppableRef={droppableRef}
+    />
+  );
+}
+
+export function DragDroppable(rawProps: DragDroppablePublicProps) {
+  const props = withDefaults(rawProps);
+  const componentRef = useRef<UnwrappedDragDroppable>(null);
+  const [
+    { isDragging, dragComponentType, dragComponentId },
+    dragSourceRef,
+    dragPreviewRef,
+  ] = useDragSpec(props);
+  const [{ isDraggingOver, isDraggingOverShallow }, droppableRef] = useDropSpec(
+    props,
+    componentRef,
+  );
+  return (
+    <UnwrappedDragDroppable
+      ref={componentRef}
+      {...props}
+      isDragging={isDragging}
+      dragComponentType={dragComponentType}
+      dragComponentId={dragComponentId}
+      dragSourceRef={dragSourceRef}
+      dragPreviewRef={dragPreviewRef}
+      isDraggingOver={isDraggingOver}
+      isDraggingOverShallow={isDraggingOverShallow}
+      droppableRef={droppableRef}
+    />
+  );
+}

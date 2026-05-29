@@ -16,31 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import type { ReactNode, ComponentType, ReactElement } from 'react';
-import type { BackgroundPosition } from './ImageLoader';
+import { shallowEqual as reactReduxShallowEqual } from 'react-redux';
 
-export interface LinkProps {
-  to: string;
-  children?: ReactNode;
-}
+/**
+ * react-redux's `shallowEqual` is typed as `(a: any, b: any) => boolean`. When
+ * passed as the equality function to `useSelector`, the `any` parameters poison
+ * the `Selected` type inference, causing the hook to return `any` and silently
+ * dropping type safety for the selected state.
+ *
+ * This re-export gives `shallowEqual` a generic signature so that `useSelector`
+ * can correctly infer the selected state type while keeping the exact same
+ * runtime implementation.
+ */
+export const shallowEqual: <T>(a: T, b: T) => boolean = reactReduxShallowEqual;
 
-export interface ListViewCardProps {
-  title?: ReactNode;
-  subtitle?: ReactNode;
-  url?: string;
-  linkComponent?: ComponentType<LinkProps>;
-  imgURL?: string | null;
-  imgFallbackURL?: string;
-  imgPosition?: BackgroundPosition;
-  description: string;
-  loading?: boolean;
-  titleRight?: ReactNode;
-  coverLeft?: ReactNode;
-  coverRight?: ReactNode;
-  actions?: ReactNode | null;
-  rows?: number | string;
-  avatar?: ReactElement | null;
-  cover?: ReactNode | null;
-  certifiedBy?: string;
-  certificationDetails?: string;
-}
+export default shallowEqual;

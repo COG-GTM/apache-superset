@@ -23,6 +23,9 @@ import {
   StoreEnhancer,
 } from '@reduxjs/toolkit';
 import thunk from 'redux-thunk';
+// Globally augments redux's `Dispatch` type to accept thunk actions, so that
+// `useDispatch()` (typed as `Dispatch<AnyAction>`) accepts thunks app-wide.
+import 'redux-thunk/extend-redux';
 import { api } from 'src/hooks/apiResources/queryApi';
 import messageToastReducer from 'src/components/MessageToasts/reducers';
 import charts from 'src/components/Chart/chartReducer';

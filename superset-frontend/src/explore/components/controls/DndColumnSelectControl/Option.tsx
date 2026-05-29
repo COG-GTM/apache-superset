@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { useCallback } from 'react';
+import { type MouseEvent as ReactMouseEvent, useCallback } from 'react';
 import { t } from '@apache-superset/core/translation';
 import { css, styled, useTheme } from '@apache-superset/core/theme';
 import { Icons, InfoTooltip } from '@superset-ui/core/components';
@@ -44,7 +44,7 @@ export default function Option({
 }: OptionProps) {
   const theme = useTheme();
   const onClickClose = useCallback(
-    e => {
+    (e: ReactMouseEvent) => {
       e.stopPropagation();
       clickClose(index);
     },

@@ -19,6 +19,7 @@
 import { useState, useMemo, useCallback, useEffect, memo } from 'react';
 
 import { ResizeCallback, ResizeStartCallback } from 're-resizable';
+import type { ConnectDragSource } from 'react-dnd';
 import cx from 'classnames';
 import { useSelector } from 'react-redux';
 import { css, useTheme } from '@apache-superset/core/theme';
@@ -239,7 +240,7 @@ const ChartHolder = ({
   }, []);
 
   const renderChild = useCallback(
-    ({ dragSourceRef }) => (
+    ({ dragSourceRef }: { dragSourceRef: ConnectDragSource }) => (
       <ResizableContainer
         id={component.id}
         adjustableWidth={parentComponent.type === ROW_TYPE}

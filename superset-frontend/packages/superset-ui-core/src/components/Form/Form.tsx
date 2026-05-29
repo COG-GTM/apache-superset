@@ -16,11 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import type { ReactElement } from 'react';
 import { Form as AntdForm } from 'antd';
 import { FormProps } from './types';
 
+// antd's Form allows a render-prop function as children (ReactNode | RenderProps).
+// Under React 18 types a function is not assignable to ReactNode in JSX, so re-type
+// the component to accept FormProps directly while preserving full prop typing.
+const TypedAntdForm = AntdForm as unknown as (props: FormProps) => ReactElement;
+
 function CustomForm(props: FormProps) {
-  return <AntdForm {...props} />;
+  return <TypedAntdForm {...props} />;
 }
 
 export const Form = Object.assign(CustomForm, {

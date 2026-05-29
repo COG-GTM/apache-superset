@@ -22,6 +22,7 @@ import { ReactNode, ReactElement } from 'react';
 import {
   render,
   RenderOptions,
+  RenderResult,
   screen,
   waitFor,
   within,
@@ -122,7 +123,7 @@ export function createWrapper(options?: Options) {
   };
 }
 
-const customRender = (ui: ReactElement, options?: Options) =>
+const customRender = (ui: ReactElement, options?: Options): RenderResult =>
   render(ui, { wrapper: createWrapper(options), ...options });
 
 export function sleep(time: number) {

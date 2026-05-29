@@ -29,7 +29,8 @@ import {
 import { CopyToClipboard } from 'src/components';
 import { getDashboardPermalink } from 'src/utils/urlUtils';
 import { useToasts } from 'src/components/MessageToasts/withToasts';
-import { shallowEqual, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { shallowEqual } from 'src/utils/shallowEqual';
 import { RootState } from 'src/dashboard/types';
 import { Typography } from '@superset-ui/core/components/Typography';
 import { hasStatefulCharts } from 'src/dashboard/util/chartStateConverter';

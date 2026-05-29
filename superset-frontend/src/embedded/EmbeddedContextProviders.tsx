@@ -59,7 +59,9 @@ export const getThemeController = (): ThemeController => themeController;
 
 const extensionsRegistry = getExtensionsRegistry();
 
-export const EmbeddedContextProviders: React.FC = ({ children }) => {
+export const EmbeddedContextProviders: React.FC<React.PropsWithChildren> = ({
+  children,
+}) => {
   const RootContextProviderExtension = extensionsRegistry.get(
     'root.context.provider',
   );

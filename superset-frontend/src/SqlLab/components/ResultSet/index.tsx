@@ -27,7 +27,8 @@ import {
 } from 'react';
 
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'src/utils/shallowEqual';
 import { useHistory } from 'react-router-dom';
 import { pick } from 'lodash';
 import {

@@ -17,7 +17,8 @@
  * under the License.
  */
 import { useEffect, useMemo, useState } from 'react';
-import { shallowEqual, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { shallowEqual } from 'src/utils/shallowEqual';
 import { useInView } from 'react-intersection-observer';
 import { omit } from 'lodash';
 import { EmptyState, Skeleton } from '@superset-ui/core/components';
