@@ -17,7 +17,7 @@
  * under the License.
  */
 import { TextEncoder, TextDecoder } from 'util';
-import { renderHook, act } from '@testing-library/react-hooks';
+import { renderHook, act } from '@testing-library/react';
 import { waitFor } from '@testing-library/react';
 import { useStreamingExport } from './useStreamingExport';
 import { ExportStatus } from './StreamingExportModal';
