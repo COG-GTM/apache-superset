@@ -23,7 +23,8 @@ import {
   type ChangeEvent,
   useMemo,
 } from 'react';
-import { useSelector, useDispatch, shallowEqual } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { shallowEqual } from 'src/utils/shallowEqual';
 import { styled, css, useTheme } from '@apache-superset/core/theme';
 import { t } from '@apache-superset/core/translation';
 import AutoSizer from 'react-virtualized-auto-sizer';

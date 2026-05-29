@@ -17,7 +17,8 @@
  * under the License.
  */
 import { useEffect, useMemo, useRef } from 'react';
-import { useSelector, useDispatch, shallowEqual, useStore } from 'react-redux';
+import { useSelector, useDispatch, useStore } from 'react-redux';
+import { shallowEqual } from 'src/utils/shallowEqual';
 import { t } from '@apache-superset/core/translation';
 import { getExtensionsRegistry } from '@superset-ui/core';
 
@@ -121,7 +122,9 @@ export function useKeywords(
   );
 
   const store = useStore();
-  const apiState = store.getState()[api.reducerPath];
+  const apiState = (
+    store.getState() as Record<string, ReturnType<typeof api.reducer>>
+  )[api.reducerPath];
 
   const allColumns = useMemo(() => {
     const columns = new Set<string>();

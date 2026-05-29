@@ -127,8 +127,8 @@ export const dragConfig: [
       dragSourceRef: connect.dragSource(),
       dragPreviewRef: connect.dragPreview(),
       isDragging: monitor.isDragging(),
-      dragComponentType: monitor.getItem()?.type as ComponentType,
-      dragComponentId: monitor.getItem()?.id as string,
+      dragComponentType: (monitor.getItem() as DragItem | null)?.type,
+      dragComponentId: (monitor.getItem() as DragItem | null)?.id,
     };
   },
 ];

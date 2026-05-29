@@ -17,7 +17,8 @@
  * under the License.
  */
 import { type FC, useCallback, useMemo, useRef, useState } from 'react';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'src/utils/shallowEqual';
 import { nanoid } from 'nanoid';
 import { t } from '@apache-superset/core/translation';
 import { ClientErrorObject, getExtensionsRegistry } from '@superset-ui/core';

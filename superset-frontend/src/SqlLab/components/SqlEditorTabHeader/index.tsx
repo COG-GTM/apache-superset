@@ -19,7 +19,8 @@
 import { useMemo, FC } from 'react';
 
 import { bindActionCreators } from 'redux';
-import { useSelector, useDispatch, shallowEqual } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { shallowEqual } from 'src/utils/shallowEqual';
 import { MenuDotsDropdown } from '@superset-ui/core/components';
 import { Menu, MenuItemType } from '@superset-ui/core/components/Menu';
 import { t } from '@apache-superset/core/translation';

@@ -40,6 +40,7 @@ import {
   GridReadyEvent,
   GridState,
   CellClickedEvent,
+  type ColumnHeaderClickedEvent,
   IMenuActionParams,
 } from '@superset-ui/core/components/ThemedAgGridReact';
 import { t } from '@apache-superset/core/translation';
@@ -298,9 +299,10 @@ const AgGridDataTable: FunctionComponent<AgGridTableProps> = memo(
     };
 
     const handleColumnHeaderClick = useCallback(
-      params => {
-        const colId = params?.column?.colId;
-        const sortDir = params?.column?.sort;
+      (params: ColumnHeaderClickedEvent) => {
+        const column = params?.column as unknown as ColumnState | undefined;
+        const colId = column?.colId ?? '';
+        const sortDir = column?.sort ?? '';
         handleColSort(colId, sortDir);
       },
       [serverPagination, gridInitialState, percentMetrics, onSortChange],

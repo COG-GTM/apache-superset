@@ -388,7 +388,7 @@ const config = {
               'react-dom',
               'redux',
               'react-redux',
-              'react-sortable-hoc',
+              '@dnd-kit.*',
               'react-table',
               'react-ace',
               'webpack.*',

@@ -38,13 +38,16 @@ describe('ChartLayer', () => {
       locale: 'en',
     };
     const chartLayer = new ChartLayer(options);
+    const unmount = jest.fn();
     chartLayer.charts = [
       {
         htmlElement: document.createElement('div'),
+        root: { unmount },
       },
     ];
 
     chartLayer.removeAllChartElements();
+    expect(unmount).toHaveBeenCalled();
     expect(chartLayer.charts).toEqual([]);
   });
 });

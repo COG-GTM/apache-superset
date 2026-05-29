@@ -19,7 +19,7 @@
 import { useCallback, useMemo } from 'react';
 import { css, useTheme } from '@apache-superset/core/theme';
 import { ThemedAgGridReact } from '@superset-ui/core/components';
-import type { Column, GridOptions } from 'ag-grid-community';
+import type { Column, GridOptions, CellKeyDownEvent } from 'ag-grid-community';
 import type { AgGridReactProps } from 'ag-grid-react';
 
 import copyTextToClipboard from 'src/utils/copy';
@@ -54,31 +54,43 @@ export function GridTable<RecordType extends object>({
   );
   const rowIndexLength = `${data.length}}`.length;
   const onKeyDown: AgGridReactProps<Record<string, any>>['onCellKeyDown'] =
-    useCallback(({ event, column, data, value, api }) => {
-      if (
-        !document.getSelection?.()?.toString?.() &&
-        event &&
-        event.key === 'c' &&
-        (event.ctrlKey || event.metaKey)
-      ) {
-        const columns =
-          column.getColId() === PIVOT_COL_ID
-            ? api
-                .getAllDisplayedColumns()
-                .filter((column: Column) => column.getColId() !== PIVOT_COL_ID)
-            : [column];
-        const record =
-          column.getColId() === PIVOT_COL_ID
-            ? [
-                columns.map((column: Column) => column.getColId()).join('\t'),
-                columns
-                  .map((column: Column) => data?.[column.getColId()])
-                  .join('\t'),
-              ].join('\n')
-            : String(value);
-        copyTextToClipboard(() => Promise.resolve(record));
-      }
-    }, []);
+    useCallback(
+      ({
+        event,
+        column,
+        data,
+        value,
+        api,
+      }: CellKeyDownEvent<Record<string, any>>) => {
+        const keyboardEvent = event as KeyboardEvent | null;
+        if (
+          !document.getSelection?.()?.toString?.() &&
+          keyboardEvent &&
+          keyboardEvent.key === 'c' &&
+          (keyboardEvent.ctrlKey || keyboardEvent.metaKey)
+        ) {
+          const columns =
+            column.getColId() === PIVOT_COL_ID
+              ? api
+                  .getAllDisplayedColumns()
+                  .filter(
+                    (column: Column) => column.getColId() !== PIVOT_COL_ID,
+                  )
+              : [column];
+          const record =
+            column.getColId() === PIVOT_COL_ID
+              ? [
+                  columns.map((column: Column) => column.getColId()).join('\t'),
+                  columns
+                    .map((column: Column) => data?.[column.getColId()])
+                    .join('\t'),
+                ].join('\n')
+              : String(value);
+          copyTextToClipboard(() => Promise.resolve(record));
+        }
+      },
+      [],
+    );
   const columnDefs = useMemo(
     () =>
       [

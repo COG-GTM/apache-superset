@@ -58,6 +58,7 @@ import {
 import FilterBar from 'src/dashboard/components/nativeFilters/FilterBar';
 import { useUiConfig } from 'src/components/UiConfigContext';
 import ResizableSidebar from 'src/components/ResizableSidebar';
+import { DropResult } from 'src/dashboard/components/dnd/dragDroppableConfig';
 import {
   BUILDER_SIDEPANEL_WIDTH,
   CLOSED_FILTER_BAR_WIDTH,
@@ -401,7 +402,7 @@ const DashboardBuilder = () => {
   }, [dashboardLayout, dispatch]);
 
   const handleDrop = useCallback(
-    dropResult => dispatch(handleComponentDrop(dropResult)),
+    (dropResult: DropResult) => dispatch(handleComponentDrop(dropResult)),
     [dispatch],
   );
 
@@ -564,7 +565,7 @@ const DashboardBuilder = () => {
     : theme.sizeUnit * 8;
 
   const renderChild = useCallback(
-    adjustedWidth => {
+    (adjustedWidth: number) => {
       const filterBarWidth = dashboardFiltersOpen
         ? adjustedWidth
         : CLOSED_FILTER_BAR_WIDTH;

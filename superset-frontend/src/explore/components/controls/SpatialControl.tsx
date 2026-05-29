@@ -27,7 +27,7 @@ import {
 import { t } from '@apache-superset/core/translation';
 
 import PopoverSection from '@superset-ui/core/components/PopoverSection';
-import ControlHeader from '../ControlHeader';
+import ControlHeader, { ControlHeaderProps } from '../ControlHeader';
 import SelectControl from './SelectControl';
 
 const spatialTypes = {
@@ -48,7 +48,7 @@ interface SpatialValue {
   geohashCol?: string;
 }
 
-interface SpatialControlProps {
+interface SpatialControlProps extends ControlHeaderProps {
   onChange?: (value: SpatialValue, errors: string[]) => void;
   value?: SpatialValue;
   animation?: boolean;

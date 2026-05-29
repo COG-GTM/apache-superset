@@ -26,7 +26,8 @@ import {
 import { styled, css, SupersetTheme } from '@apache-superset/core/theme';
 import { t } from '@apache-superset/core/translation';
 import { Global } from '@emotion/react';
-import { shallowEqual, useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { shallowEqual } from 'src/utils/shallowEqual';
 import { bindActionCreators } from 'redux';
 import { LOG_ACTIONS_TOGGLE_EDIT_DASHBOARD } from 'src/logger/LogUtils';
 import { Icons } from '@superset-ui/core/components/Icons';

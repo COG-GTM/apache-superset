@@ -16,7 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { ChangeEvent, useCallback, useState } from 'react';
+import {
+  ChangeEvent,
+  type FocusEvent as ReactFocusEvent,
+  useCallback,
+  useState,
+} from 'react';
 import { t } from '@apache-superset/core/translation';
 import { styled, useTheme } from '@apache-superset/core/theme';
 import { Input, Tooltip } from '@superset-ui/core/components';
@@ -63,9 +68,9 @@ export const DndColumnSelectPopoverTitle = ({
   }, []);
 
   const onInputBlur = useCallback(
-    e => {
+    (e: ReactFocusEvent<HTMLInputElement>) => {
       if (e.target.value === '') {
-        onChange(e);
+        onChange(e as unknown as ChangeEvent<HTMLInputElement>);
       }
       onBlur();
     },

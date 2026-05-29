@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { PureComponent } from 'react';
+import { PureComponent, type ErrorInfo } from 'react';
 import { logging } from '@apache-superset/core/utils';
 import { t } from '@apache-superset/core/translation';
 import {
@@ -235,16 +235,13 @@ class Chart extends PureComponent<ChartProps, {}> {
     );
   }
 
-  handleRenderContainerFailure(
-    error: Error,
-    info: { componentStack: string } | null,
-  ) {
+  handleRenderContainerFailure(error: Error, info: ErrorInfo | null) {
     const { actions, chartId } = this.props;
     logging.warn(error);
     actions.chartRenderingFailed(
       error.toString(),
       chartId,
-      info ? info.componentStack : null,
+      info ? (info.componentStack ?? null) : null,
     );
 
     actions.logEvent(LOG_ACTIONS_RENDER_CHART, {

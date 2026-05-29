@@ -19,7 +19,6 @@
 import {
   useEffect,
   useState,
-  RefObject,
   forwardRef,
   ComponentType,
   ForwardRefExoticComponent,
@@ -97,10 +96,10 @@ export function AsyncEsmComponent<
     preload?: typeof waitForPromise;
   };
 
-  const AsyncComponent: AsyncComponent = forwardRef(function AsyncComponent(
-    props: FullProps,
-    ref: RefObject<ComponentType<FullProps>>,
-  ) {
+  const AsyncComponent: AsyncComponent = forwardRef<
+    ComponentType<FullProps>,
+    FullProps
+  >(function AsyncComponent(props, ref) {
     const [loaded, setLoaded] = useState(component !== undefined);
     useEffect(() => {
       let isMounted = true;

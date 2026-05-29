@@ -21,7 +21,8 @@ import { t } from '@apache-superset/core/translation';
 import { DashboardComponentMetadata, JsonObject } from '@superset-ui/core';
 import backgroundStyleOptions from 'src/dashboard/util/backgroundStyleOptions';
 import cx from 'classnames';
-import { shallowEqual, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { shallowEqual } from 'src/utils/shallowEqual';
 import { ResizeCallback, ResizeStartCallback } from 're-resizable';
 import type { ConnectDragSource } from 'react-dnd';
 import { Draggable } from '../../dnd/DragDroppable';
@@ -125,7 +126,7 @@ const DynamicComponent: FC<DynamicComponentProps> = ({
             <BackgroundStyleDropdown
               id={`${component.id}-background`}
               value={component.meta.background}
-              onChange={value => updateMeta('background', value)}
+              onChange={value => updateMeta('background', value as string)}
             />,
           ]}
           editMode={editMode}

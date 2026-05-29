@@ -16,17 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import React, { Component } from 'react';
+import React, { Component, type CSSProperties, type ReactNode } from 'react';
 import { IconTooltip, List } from '@superset-ui/core/components';
 import { nanoid } from 'nanoid';
 import { t } from '@apache-superset/core/translation';
 import { withTheme, type SupersetTheme } from '@apache-superset/core/theme';
 import {
-  SortableContainer,
-  SortableHandle,
-  SortableElement,
+  DndContext,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
   arrayMove,
-} from 'react-sortable-hoc';
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { Icons } from '@superset-ui/core/components/Icons';
 import {
   HeaderContainer,
@@ -67,16 +76,104 @@ const defaultProps: Partial<CollectionControlProps> = {
   value: [],
   addTooltip: t('Add an item'),
 };
-const SortableListItem = SortableElement(CustomListItem);
-const SortableList = SortableContainer(List);
-const SortableDragger = SortableHandle(() => (
-  <Icons.MenuOutlined
-    role="img"
-    aria-label={t('Drag to reorder')}
-    className="text-primary"
-    style={{ cursor: 'ns-resize' }}
-  />
-));
+function SortableList({
+  ids,
+  onSortEnd,
+  children,
+}: {
+  ids: string[];
+  onSortEnd: (oldIndex: number, newIndex: number) => void;
+  children: ReactNode;
+}) {
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+  );
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) {
+      return;
+    }
+    const oldIndex = ids.indexOf(String(active.id));
+    const newIndex = ids.indexOf(String(over.id));
+    if (oldIndex !== -1 && newIndex !== -1) {
+      onSortEnd(oldIndex, newIndex);
+    }
+  };
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext items={ids} strategy={verticalListSortingStrategy}>
+        <List
+          bordered
+          css={(theme: SupersetTheme) => ({
+            borderRadius: theme.borderRadius,
+          })}
+        >
+          {children}
+        </List>
+      </SortableContext>
+    </DndContext>
+  );
+}
+
+function SortableListItem({
+  id,
+  children,
+}: {
+  id: string;
+  children: ReactNode;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id });
+
+  // lockAxis="y": ignore horizontal translation while dragging.
+  const style: CSSProperties = {
+    transform: CSS.Transform.toString(
+      transform ? { ...transform, x: 0, scaleX: 1, scaleY: 1 } : transform,
+    ),
+    transition: transition || undefined,
+    zIndex: isDragging ? 1 : undefined,
+  };
+
+  return (
+    <CustomListItem
+      ref={setNodeRef}
+      style={style}
+      selectable={false}
+      className="clearfix"
+      css={(theme: SupersetTheme) => ({
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        display: 'flex',
+        paddingInline: theme.sizeUnit * 6,
+      })}
+    >
+      <span
+        {...attributes}
+        {...listeners}
+        css={{ display: 'inline-flex', cursor: 'ns-resize' }}
+      >
+        <Icons.MenuOutlined
+          role="img"
+          aria-label={t('Drag to reorder')}
+          className="text-primary"
+        />
+      </span>
+      {children}
+    </CustomListItem>
+  );
+}
 
 class CollectionControl extends Component<CollectionControlProps> {
   static defaultProps = defaultProps;
@@ -102,7 +199,7 @@ class CollectionControl extends Component<CollectionControlProps> {
     );
   }
 
-  onSortEnd({ oldIndex, newIndex }: { oldIndex: number; newIndex: number }) {
+  onSortEnd(oldIndex: number, newIndex: number) {
     const currentValue = this.props.value ?? [];
     this.props.onChange?.(arrayMove(currentValue, oldIndex, newIndex));
   }
@@ -122,33 +219,16 @@ class CollectionControl extends Component<CollectionControlProps> {
     ];
     const keyAccessor =
       this.props.keyAccessor ?? ((o: CollectionItem) => o.key ?? '');
+    const ids = currentValue.map(
+      (o: CollectionItem, i: number) => keyAccessor(o) || String(i),
+    );
     return (
-      <SortableList
-        useDragHandle
-        lockAxis="y"
-        onSortEnd={this.onSortEnd.bind(this)}
-        bordered
-        css={(theme: SupersetTheme) => ({
-          borderRadius: theme.borderRadius,
-        })}
-      >
+      <SortableList ids={ids} onSortEnd={this.onSortEnd.bind(this)}>
         {currentValue.map((o: CollectionItem, i: number) => {
           // label relevant only for header, not here
           const { label, theme, ...commonProps } = this.props;
           return (
-            <SortableListItem
-              selectable={false}
-              className="clearfix"
-              css={(theme: SupersetTheme) => ({
-                alignItems: 'center',
-                justifyContent: 'flex-start',
-                display: 'flex',
-                paddingInline: theme.sizeUnit * 6,
-              })}
-              key={keyAccessor(o)}
-              index={i}
-            >
-              <SortableDragger />
+            <SortableListItem key={ids[i]} id={ids[i]}>
               <div
                 css={(theme: SupersetTheme) => ({
                   flex: 1,

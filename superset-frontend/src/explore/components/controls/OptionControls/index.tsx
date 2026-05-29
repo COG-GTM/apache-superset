@@ -18,7 +18,12 @@
  */
 import { useRef, ReactNode } from 'react';
 
-import { useDrag, useDrop, DropTargetMonitor } from 'react-dnd';
+import {
+  useDrag,
+  useDrop,
+  DropTargetMonitor,
+  DragSourceMonitor,
+} from 'react-dnd';
 import { t } from '@apache-superset/core/translation';
 import { styled, useTheme, css, keyframes } from '@apache-superset/core/theme';
 import { InfoTooltip, Icons, Tooltip } from '@superset-ui/core/components';
@@ -329,12 +334,13 @@ export const OptionControlLabel = ({
     },
   });
   const [{ isDragging }, drag] = useDrag({
+    type,
     item: {
       type,
       dragIndex: index,
       value: savedMetric?.metric_name ? savedMetric : adhocMetric,
     },
-    collect: monitor => ({
+    collect: (monitor: DragSourceMonitor) => ({
       isDragging: monitor.isDragging(),
     }),
   });

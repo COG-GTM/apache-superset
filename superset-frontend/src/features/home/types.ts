@@ -17,6 +17,7 @@
  * under the License.
  */
 
+import type { ReactNode } from 'react';
 import { Filter } from 'src/views/CRUD/types';
 import { NavBarProps, MenuObjectProps } from 'src/types/bootstrapTypes';
 
@@ -37,6 +38,7 @@ export interface ExtensionConfigs {
   HAS_GSHEETS_INSTALLED: boolean;
 }
 export interface RightMenuProps {
+  children?: ReactNode;
   align: 'flex-start' | 'flex-end';
   settings: MenuObjectProps[];
   navbarRight: NavBarProps;

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { FC } from 'react';
+import type { FC } from 'react';
 import { styled, useTheme, css } from '@apache-superset/core/theme';
 import { Skeleton } from '../Skeleton';
 import { Card } from '../Card';
