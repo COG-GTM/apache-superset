@@ -28,9 +28,7 @@ import Footer from 'src/features/datasets/AddDataset/Footer';
 const mockHistoryPush = jest.fn();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useHistory: () => ({
-    push: mockHistoryPush,
-  }),
+  useNavigate: () => mockHistoryPush,
 }));
 
 // eslint-disable-next-line no-restricted-globals -- TODO: Migrate from describe blocks

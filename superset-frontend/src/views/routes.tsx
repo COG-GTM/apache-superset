@@ -298,7 +298,7 @@ export const routes: Routes = [
     Component: Chart,
   },
   {
-    path: '/superset/explore/p',
+    path: '/superset/explore/p/*',
     Component: Chart,
   },
   {

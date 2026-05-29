@@ -19,7 +19,7 @@
 import { Suspense, useEffect } from 'react';
 import {
   BrowserRouter as Router,
-  Switch,
+  Routes,
   Route,
   useLocation,
 } from 'react-router-dom';
@@ -80,30 +80,34 @@ const App = () => (
         isFrontendRoute={isFrontendRoute}
       />
       <ExtensionsStartup>
-        <Switch>
+        <Routes>
           {routes.map(({ path, Component, props = {}, Fallback = Loading }) => (
-            <Route path={path} key={path}>
-              <Suspense fallback={<Fallback />}>
-                <Layout>
-                  <Layout.Content
-                    css={css`
-                      display: flex;
-                      flex-direction: column;
-                    `}
-                  >
-                    <ErrorBoundary
+            <Route
+              path={path}
+              key={path}
+              element={
+                <Suspense fallback={<Fallback />}>
+                  <Layout>
+                    <Layout.Content
                       css={css`
-                        margin: 16px;
+                        display: flex;
+                        flex-direction: column;
                       `}
                     >
-                      <Component user={bootstrapData.user} {...props} />
-                    </ErrorBoundary>
-                  </Layout.Content>
-                </Layout>
-              </Suspense>
-            </Route>
+                      <ErrorBoundary
+                        css={css`
+                          margin: 16px;
+                        `}
+                      >
+                        <Component user={bootstrapData.user} {...props} />
+                      </ErrorBoundary>
+                    </Layout.Content>
+                  </Layout>
+                </Suspense>
+              }
+            />
           ))}
-        </Switch>
+        </Routes>
       </ExtensionsStartup>
       <ToastContainer />
     </RootContextProviders>

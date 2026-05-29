@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { PureComponent, ReactNode } from 'react';
+import React, { PureComponent, ReactNode } from 'react';
 import rison from 'rison';
 import { t } from '@apache-superset/core/translation';
 import { isDefined, JsonResponse, SupersetClient } from '@superset-ui/core';
@@ -24,7 +24,8 @@ import { styled } from '@apache-superset/core/theme';
 import { withTheme, Theme } from '@emotion/react';
 import { getUrlParam } from 'src/utils/urlUtils';
 import { FilterPlugins, URL_PARAMS } from 'src/constants';
-import { Link, withRouter, RouteComponentProps } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import withRouter, { type RouterProps } from 'src/utils/withRouter';
 import {
   AsyncSelect,
   Button,
@@ -45,7 +46,7 @@ import {
 } from 'src/features/datasets/DatasetSelectLabel';
 import { Icons } from '@superset-ui/core/components/Icons';
 
-export interface ChartCreationProps extends RouteComponentProps {
+export interface ChartCreationProps extends RouterProps {
   user: UserWithPermissionsAndRoles;
   addSuccessToast: (arg: string) => void;
   theme: Theme;
@@ -224,7 +225,7 @@ export class ChartCreation extends PureComponent<
   }
 
   gotoSlice() {
-    this.props.history.push(this.exploreUrl());
+    this.props.navigate(this.exploreUrl());
   }
 
   changeDatasource(datasource: { label: string | ReactNode; value: string }) {
@@ -386,4 +387,6 @@ export class ChartCreation extends PureComponent<
   }
 }
 
-export default withRouter(withToasts(withTheme(ChartCreation)));
+export default withRouter(
+  withToasts(withTheme(ChartCreation)) as React.ComponentType<any>,
+);

@@ -21,7 +21,7 @@ import { useMemo, useState } from 'react';
 import rison from 'rison';
 import { t } from '@apache-superset/core/translation';
 import { SupersetClient } from '@superset-ui/core';
-import { Link, useHistory } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useListViewResource } from 'src/views/CRUD/hooks';
 import { createFetchRelated, createErrorHandler } from 'src/views/CRUD/utils';
 import withToasts from 'src/components/MessageToasts/withToasts';
@@ -143,7 +143,7 @@ function AnnotationLayersList({
           let hasHistory = true;
 
           try {
-            useHistory();
+            useNavigate();
           } catch (err) {
             // If error is thrown, we know not to use <Link> in render
             hasHistory = false;

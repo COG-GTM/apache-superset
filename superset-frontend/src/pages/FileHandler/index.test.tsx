@@ -80,12 +80,10 @@ jest.mock('src/features/databases/UploadDataModel', () => ({
   ),
 }));
 
-// Mock react-router-dom's useHistory
+// Mock react-router-dom's useNavigate
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
-  useHistory: () => ({
-    push: mockHistoryPush,
-  }),
+  useNavigate: () => mockHistoryPush,
 }));
 
 // Mock the File API

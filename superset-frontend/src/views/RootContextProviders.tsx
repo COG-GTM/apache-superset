@@ -20,7 +20,7 @@
 import { getExtensionsRegistry } from '@superset-ui/core';
 import { Provider as ReduxProvider } from 'react-redux';
 import { QueryParamProvider } from 'use-query-params';
-import { ReactRouter5Adapter } from 'use-query-params/adapters/react-router-5';
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DynamicPluginProvider } from 'src/components';
@@ -46,7 +46,7 @@ export const RootContextProviders: React.FC = ({ children }) => {
           <EmbeddedUiConfigProvider>
             <DynamicPluginProvider>
               <QueryParamProvider
-                adapter={ReactRouter5Adapter}
+                adapter={ReactRouter6Adapter}
                 options={{
                   searchStringToObject: querystring.parse,
                   objectToSearchString: (object: Record<string, any>) =>

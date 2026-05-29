@@ -43,7 +43,7 @@ import {
 } from '@superset-ui/core';
 import { styled } from '@apache-superset/core/theme';
 import { Constants } from '@superset-ui/core/components';
-import { useHistory } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { updateDataMask, removeDataMask } from 'src/dataMask/actions';
 import {
   saveChartCustomization,
@@ -96,13 +96,13 @@ const EMPTY_DATA_MASK_RECORD: Record<string, DataMask> = {};
 
 const publishDataMask = debounce(
   async (
-    history,
-    dashboardId,
-    updateKey,
+    navigate: ReturnType<typeof useNavigate>,
+    location: ReturnType<typeof useLocation>,
+    dashboardId: number | string,
+    updateKey: number,
     dataMaskSelected: DataMaskStateWithId,
-    tabId,
+    tabId: string | undefined,
   ) => {
-    const { location } = history;
     const { search } = location;
     const previousParams = new URLSearchParams(search);
     const newParams = new URLSearchParams();
@@ -148,10 +148,13 @@ const publishDataMask = debounce(
       if (appRoot !== '/' && replacementPathname.startsWith(appRoot)) {
         replacementPathname = replacementPathname.substring(appRoot.length);
       }
-      history.replace({
-        pathname: replacementPathname,
-        search: newParams.toString(),
-      });
+      navigate(
+        {
+          pathname: replacementPathname,
+          search: newParams.toString(),
+        },
+        { replace: true },
+      );
     }
   },
   Constants.SLOW_DEBOUNCE,
@@ -162,7 +165,8 @@ const FilterBar: FC<FiltersBarProps> = ({
   verticalConfig,
   hidden = false,
 }) => {
-  const history = useHistory();
+  const navigate = useNavigate();
+  const location = useLocation();
   const dataMaskApplied: DataMaskStateWithId = useAllAppliedDataMask();
 
   const [dataMaskSelected, setDataMaskSelected] =
@@ -393,10 +397,17 @@ const FilterBar: FC<FiltersBarProps> = ({
   useEffect(() => {
     // embedded users can't persist filter combinations
     if (user?.userId) {
-      publishDataMask(history, dashboardId, updateKey, dataMaskApplied, tabId);
+      publishDataMask(
+        navigate,
+        location,
+        dashboardId,
+        updateKey,
+        dataMaskApplied,
+        tabId,
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dashboardId, dataMaskAppliedText, history, updateKey, tabId]);
+  }, [dashboardId, dataMaskAppliedText, navigate, location, updateKey, tabId]);
 
   const pendingChartCustomizations = useSelector<
     RootState,
