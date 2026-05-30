@@ -145,6 +145,11 @@ describe('RoleListEditModal', () => {
 
     render(<RoleListEditModal {...mockProps} />);
 
+    // Wait for the async user fetch to populate the form before submitting,
+    // otherwise the roleUsers field is still empty on submit.
+    expect(await screen.findByText('johndoe')).toBeInTheDocument();
+    expect(screen.getByText('janesmith')).toBeInTheDocument();
+
     fireEvent.change(screen.getByTestId('role-name-input'), {
       target: { value: 'Updated Role' },
     });
