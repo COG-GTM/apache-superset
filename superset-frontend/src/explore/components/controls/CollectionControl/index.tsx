@@ -17,6 +17,7 @@
  * under the License.
  */
 import React, { Component } from 'react';
+import { type Interpolation, type Theme } from '@emotion/react';
 import { IconTooltip, List } from '@superset-ui/core/components';
 import { nanoid } from 'nanoid';
 import { t } from '@apache-superset/core/translation';
@@ -67,8 +68,23 @@ const defaultProps: Partial<CollectionControlProps> = {
   value: [],
   addTooltip: t('Add an item'),
 };
-const SortableListItem = SortableElement(CustomListItem);
-const SortableList = SortableContainer(List);
+const SortableListItem = SortableElement(CustomListItem) as React.ComponentType<
+  React.PropsWithChildren<{
+    selectable?: boolean;
+    className?: string;
+    index?: number;
+    css?: Interpolation<Theme>;
+  }>
+>;
+const SortableList = SortableContainer(List) as React.ComponentType<
+  React.PropsWithChildren<{
+    useDragHandle?: boolean;
+    lockAxis?: string;
+    onSortEnd?: (params: { oldIndex: number; newIndex: number }) => void;
+    bordered?: boolean;
+    css?: Interpolation<Theme>;
+  }>
+>;
 const SortableDragger = SortableHandle(() => (
   <Icons.MenuOutlined
     role="img"

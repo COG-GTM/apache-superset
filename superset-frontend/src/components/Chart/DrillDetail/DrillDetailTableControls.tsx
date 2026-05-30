@@ -58,7 +58,7 @@ export default function TableControls({
   );
 
   const removeFilter = useCallback(
-    colName => {
+    (colName: string) => {
       const updatedFilterMap = { ...filterMap };
       delete updatedFilterMap[colName];
       setFilters(Object.values(updatedFilterMap));
@@ -71,7 +71,13 @@ export default function TableControls({
       Object.entries(filterMap)
         .map(([colName, { val, formattedVal }]) => ({
           colName,
-          val: formattedVal ?? val,
+          val:
+            formattedVal ??
+            (val instanceof Date
+              ? val.toISOString()
+              : typeof val === 'bigint'
+                ? val.toString()
+                : val),
         }))
         .sort((a, b) => a.colName.localeCompare(b.colName)),
     [filterMap],

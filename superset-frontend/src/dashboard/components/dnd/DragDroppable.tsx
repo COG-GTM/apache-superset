@@ -43,7 +43,7 @@ interface DropIndicatorProps {
   className: string;
 }
 
-interface ChildProps {
+export interface ChildProps {
   dragSourceRef?: ConnectDragSource;
   dropIndicatorProps: DropIndicatorProps | null;
   draggingTabOnTab?: boolean;

@@ -17,7 +17,7 @@
  * under the License.
  */
 
-import { createContext, useContext, FC, ReactNode } from 'react';
+import { createContext, useContext, FC, PropsWithChildren } from 'react';
 
 import { useLocation } from 'react-router-dom';
 
@@ -31,7 +31,7 @@ const { Provider } = locationContext;
 
 const EMPTY_STATE: LocationState = {};
 
-export const LocationProvider: FC = ({ children }: { children: ReactNode }) => {
+export const LocationProvider: FC<PropsWithChildren> = ({ children }) => {
   const location = useLocation<LocationState>();
   if (location.state) {
     return <Provider value={location.state}>{children}</Provider>;

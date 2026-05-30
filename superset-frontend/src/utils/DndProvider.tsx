@@ -16,20 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import type { FC } from 'react';
-import { Form as AntdForm } from 'antd';
-import { FormProps } from './types';
+import type { FC, PropsWithChildren } from 'react';
+import type { BackendFactory } from 'dnd-core';
+import { DndProvider as BaseDndProvider } from 'react-dnd';
 
-const TypedAntdForm = AntdForm as unknown as FC<FormProps>;
+/**
+ * react-dnd v11's `DndProvider` is typed as `React.FC<DndProviderProps>`, which
+ * under React 18's `@types/react` no longer implicitly accepts `children`. This
+ * re-export restores `children` support without changing runtime behavior.
+ */
+export const DndProvider = BaseDndProvider as unknown as FC<
+  PropsWithChildren<{ backend: BackendFactory }>
+>;
 
-function CustomForm(props: FormProps) {
-  return <TypedAntdForm {...props} />;
-}
-
-export const Form = Object.assign(CustomForm, {
-  useForm: AntdForm.useForm,
-  Item: AntdForm.Item,
-  List: AntdForm.List,
-  ErrorList: AntdForm.ErrorList,
-  Provider: AntdForm.Provider,
-});
+export default DndProvider;

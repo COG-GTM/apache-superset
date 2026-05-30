@@ -17,7 +17,7 @@
  * under the License.
  */
 import { Provider } from 'react-redux';
-import { DndProvider } from 'react-dnd';
+import { DndProvider } from 'src/utils/DndProvider';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { render, screen, fireEvent } from 'spec/helpers/testing-library';
 import newComponentFactory from 'src/dashboard/util/newComponentFactory';

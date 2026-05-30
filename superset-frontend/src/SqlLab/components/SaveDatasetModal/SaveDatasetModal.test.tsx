@@ -148,12 +148,8 @@ describe('SaveDatasetModal', () => {
     const select = screen.getByRole('combobox', { name: /existing dataset/i })!;
     userEvent.click(select);
 
-    await waitFor(() =>
-      expect(screen.queryByText('Loading...')).not.toBeVisible(),
-    );
-
-    // Select the first "existing dataset" from the listbox
-    const option = screen.getAllByText('coolest table 0')[1];
+    // Wait for the async dataset options to load and render
+    const option = (await screen.findAllByText('coolest table 0'))[1];
     userEvent.click(option);
 
     // Overwrite button should now be enabled
@@ -174,12 +170,8 @@ describe('SaveDatasetModal', () => {
     const select = screen.getByRole('combobox', { name: /existing dataset/i });
     userEvent.click(select);
 
-    await waitFor(() =>
-      expect(screen.queryByText('Loading...')).not.toBeVisible(),
-    );
-
-    // Select the first "existing dataset" from the listbox
-    const option = screen.getAllByText('coolest table 0')[1];
+    // Wait for the async dataset options to load and render
+    const option = (await screen.findAllByText('coolest table 0'))[1];
     userEvent.click(option);
 
     // Click the overwrite button to access the confirmation screen

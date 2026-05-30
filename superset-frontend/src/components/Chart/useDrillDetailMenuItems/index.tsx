@@ -36,7 +36,10 @@ import {
 } from '@superset-ui/core';
 import { css, styled } from '@apache-superset/core/theme';
 import { useSelector } from 'react-redux';
-import { type ItemType } from '@superset-ui/core/components/Menu';
+import {
+  type ItemType,
+  type MenuItemType,
+} from '@superset-ui/core/components/Menu';
 import { RootState } from 'src/dashboard/types';
 import { getSubmenuYOffset } from '../utils';
 import { MenuItemTooltip } from '../DisabledMenuItemTooltip';
@@ -116,8 +119,11 @@ export const useDrillDetailMenuItems = ({
   );
 
   const openModal = useCallback(
-    (filters, event) => {
-      onClick(event);
+    (
+      filters: BinaryQueryObjectFilterClause[],
+      event: Parameters<NonNullable<MenuItemType['onClick']>>[0],
+    ) => {
+      onClick(event.domEvent.nativeEvent as MouseEvent);
       onSelection();
       setFilters(filters);
       setShowModal(true);

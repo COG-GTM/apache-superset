@@ -17,6 +17,7 @@
  * under the License.
  */
 import type { CSSProperties, ReactNode } from 'react';
+import type { FormInstance } from '../Form/types';
 import type { ModalFuncProps } from 'antd';
 import type { ResizableProps } from 're-resizable';
 import type { DraggableProps } from 'react-draggable';
@@ -66,9 +67,10 @@ export interface StyledModalProps {
 
 export type { ModalFuncProps };
 
-export interface FormModalProps extends ModalProps {
+export interface FormModalProps extends Omit<ModalProps, 'children'> {
   initialValues?: object;
   formSubmitHandler: (values: object) => Promise<void>;
   onSave: () => void;
   requiredFields: string[];
+  children?: ReactNode | ((form: FormInstance) => ReactNode);
 }

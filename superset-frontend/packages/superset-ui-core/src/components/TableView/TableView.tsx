@@ -144,9 +144,13 @@ const RawTableView = ({
       initialState,
       manualPagination: serverPagination,
       manualSortBy: serverPagination,
-      pageCount: serverPagination
-        ? Math.ceil(totalCount / initialState.pageSize)
-        : undefined,
+      // Only provide pageCount when react-table can't derive it itself
+      // (server-side pagination). Passing `undefined` here would overwrite
+      // react-table's internally computed pageCount on every render, which
+      // breaks gotoPage under React 18's render-phase reducer invocation.
+      ...(serverPagination
+        ? { pageCount: Math.ceil(totalCount / initialState.pageSize) }
+        : {}),
       autoResetSortBy: false,
     },
     useFilters,

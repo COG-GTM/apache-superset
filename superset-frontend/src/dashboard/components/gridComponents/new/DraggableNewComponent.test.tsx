@@ -19,7 +19,7 @@
 
 import { render, screen } from 'spec/helpers/testing-library';
 
-import { DndProvider } from 'react-dnd';
+import { DndProvider } from 'src/utils/DndProvider';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import DraggableNewComponent from 'src/dashboard/components/gridComponents/new/DraggableNewComponent';
 import { CHART_TYPE } from 'src/dashboard/util/componentTypes';

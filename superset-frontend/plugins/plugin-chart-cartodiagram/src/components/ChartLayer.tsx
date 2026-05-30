@@ -19,7 +19,7 @@
 import Layer from 'ol/layer/Layer';
 import { FrameState } from 'ol/Map';
 import { apply as applyTransform } from 'ol/transform';
-import ReactDOM from 'react-dom';
+import { createRoot, Root } from 'react-dom/client';
 import { SupersetTheme } from '@apache-superset/core/theme';
 import { ChartConfig, ChartLayerOptions, ChartSizeValues } from '../types';
 import { createChartComponent } from '../util/chartUtil';
@@ -166,7 +166,7 @@ export class ChartLayer extends Layer {
    */
   removeAllChartElements() {
     this.charts.forEach(chart => {
-      ReactDOM.unmountComponentAtNode(chart.htmlElement);
+      chart.root.unmount();
       chart.htmlElement.remove();
     });
     this.charts = [];
@@ -191,10 +191,12 @@ export class ChartLayer extends Layer {
         this.theme,
         this.locale,
       );
-      ReactDOM.render(chartComponent, container);
+      const root = createRoot(container);
+      root.render(chartComponent);
 
       return {
         htmlElement: container,
+        root,
         coordinate: getProjectedCoordinateFromPointGeoJson(feature.geometry),
         width: chartWidth,
         height: chartHeight,
@@ -227,10 +229,12 @@ export class ChartLayer extends Layer {
         this.theme,
         this.locale,
       );
-      ReactDOM.render(chartComponent, chart.htmlElement);
+      const root: Root = chart.root ?? createRoot(chart.htmlElement);
+      root.render(chartComponent);
 
       return {
         ...chart,
+        root,
         width: chartWidth,
         height: chartHeight,
       };

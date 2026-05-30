@@ -30,6 +30,7 @@ import DashboardHeader from 'src/dashboard/components/Header';
 import { Icons } from '@superset-ui/core/components/Icons';
 import IconButton from 'src/dashboard/components/IconButton';
 import { Droppable } from 'src/dashboard/components/dnd/DragDroppable';
+import { type DropResult } from 'src/dashboard/components/dnd/dragDroppableConfig';
 import DashboardComponent from 'src/dashboard/containers/DashboardComponent';
 import WithPopoverMenu from 'src/dashboard/components/menu/WithPopoverMenu';
 import getDirectPathToTabIndex from 'src/dashboard/util/getDirectPathToTabIndex';
@@ -401,7 +402,7 @@ const DashboardBuilder = () => {
   }, [dashboardLayout, dispatch]);
 
   const handleDrop = useCallback(
-    dropResult => dispatch(handleComponentDrop(dropResult)),
+    (dropResult: DropResult) => dispatch(handleComponentDrop(dropResult)),
     [dispatch],
   );
 
@@ -564,7 +565,7 @@ const DashboardBuilder = () => {
     : theme.sizeUnit * 8;
 
   const renderChild = useCallback(
-    adjustedWidth => {
+    (adjustedWidth: number) => {
       const filterBarWidth = dashboardFiltersOpen
         ? adjustedWidth
         : CLOSED_FILTER_BAR_WIDTH;

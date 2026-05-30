@@ -16,16 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { useEffect, FC } from 'react';
+import { useEffect, FC, PropsWithChildren } from 'react';
 
 import { useDispatch } from 'react-redux';
 import { setStashFormData } from 'src/explore/actions/exploreActions';
 import useEffectEvent from 'src/hooks/useEffectEvent';
 
-type Props = {
+type Props = PropsWithChildren<{
   shouldStash: boolean;
   fieldNames: ReadonlyArray<string>;
-};
+}>;
 
 const StashFormDataContainer: FC<Props> = ({
   shouldStash,

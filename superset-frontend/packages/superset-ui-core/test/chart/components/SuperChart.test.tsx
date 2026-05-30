@@ -143,7 +143,10 @@ describe('SuperChart', () => {
       );
 
       expect(await screen.findByText('Custom Fallback!')).toBeInTheDocument();
-      expect(CustomFallbackComponent).toHaveBeenCalledTimes(1);
+      // React 18 re-renders the subtree once more after a thrown error in
+      // development, so the fallback may render more than once. We only care
+      // that the custom fallback was used.
+      expect(CustomFallbackComponent).toHaveBeenCalled();
     });
     test('call onErrorBoundary', async () => {
       expectedErrors = 1;

@@ -19,6 +19,7 @@
 
 import {
   CSSProperties,
+  type MouseEvent as ReactMouseEvent,
   ReactNode,
   useCallback,
   useEffect,
@@ -93,8 +94,8 @@ export const DrillBySubmenu = ({
   const showSearch = columns.length > SHOW_COLUMNS_SEARCH_THRESHOLD;
 
   const handleSelection = useCallback(
-    (event, column) => {
-      onClick(event as MouseEvent);
+    (event: ReactMouseEvent, column: Column) => {
+      onClick(event.nativeEvent);
       onSelection(column, drillByConfig);
       if (openNewModal && onDrillBy && dataset) {
         onDrillBy(column, dataset);

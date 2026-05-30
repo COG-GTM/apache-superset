@@ -35,7 +35,7 @@ import { SupersetThemeProvider } from 'src/theme/ThemeProvider';
 import { ThemeController } from 'src/theme/ThemeController';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { DndProvider } from 'react-dnd';
+import { DndProvider } from 'src/utils/DndProvider';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import reducerIndex from 'spec/helpers/reducerIndex';
 import { QueryParamProvider } from 'use-query-params';

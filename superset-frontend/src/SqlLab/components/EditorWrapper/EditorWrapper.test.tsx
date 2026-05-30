@@ -123,12 +123,19 @@ describe('EditorWrapper', () => {
     expect(MockEditorHost).toHaveBeenCalled();
     const renderCount = MockEditorHost.mock.calls.length;
     const updatedCursorPosition = { row: 1, column: 9 };
-    store.dispatch(
-      queryEditorSetCursorPosition(defaultQueryEditor, updatedCursorPosition),
-    );
+    act(() => {
+      store.dispatch(
+        queryEditorSetCursorPosition(defaultQueryEditor, updatedCursorPosition),
+      );
+    });
     expect(MockEditorHost).toHaveBeenCalledTimes(renderCount);
-    store.dispatch(queryEditorSetDb(defaultQueryEditor, 2));
-    expect(MockEditorHost).toHaveBeenCalledTimes(renderCount + 1);
+    act(() => {
+      store.dispatch(queryEditorSetDb(defaultQueryEditor, 2));
+    });
+    // Unlike a cursor position change, changing the database must re-render the
+    // editor. (The exact render count is left unasserted since effect flushing
+    // can legitimately produce more than one render.)
+    expect(MockEditorHost.mock.calls.length).toBeGreaterThan(renderCount);
   });
 
   test('clears selectedText when selection becomes empty', async () => {
