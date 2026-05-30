@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { renderHook } from '@testing-library/react-hooks';
+import { renderHook, waitFor } from '@testing-library/react';
 import { SupersetClient } from '@superset-ui/core';
 import { useDeckLayerMetadata } from './useDeckLayerMetadata';
 
@@ -52,13 +52,11 @@ test('fetches layer metadata successfully', async () => {
   };
   mockSupersetClientGet.mockResolvedValue(mockResponse);
 
-  const { result, waitForNextUpdate } = renderHook(() =>
-    useDeckLayerMetadata([1, 2]),
-  );
+  const { result } = renderHook(() => useDeckLayerMetadata([1, 2]));
 
   expect(result.current.isLoading).toBe(true);
 
-  await waitForNextUpdate();
+  await waitFor(() => expect(result.current.isLoading).toBe(false));
 
   expect(result.current.isLoading).toBe(false);
   expect(result.current.layers).toEqual([
@@ -75,11 +73,9 @@ test('handles API error and returns fallback layers', async () => {
   const errorMessage = 'Network error';
   mockSupersetClientGet.mockRejectedValue(new Error(errorMessage));
 
-  const { result, waitForNextUpdate } = renderHook(() =>
-    useDeckLayerMetadata([1, 2, 3]),
-  );
+  const { result } = renderHook(() => useDeckLayerMetadata([1, 2, 3]));
 
-  await waitForNextUpdate();
+  await waitFor(() => expect(result.current.isLoading).toBe(false));
 
   expect(result.current.isLoading).toBe(false);
   expect(result.current.error).toBe(errorMessage);
@@ -93,11 +89,9 @@ test('handles API error and returns fallback layers', async () => {
 test('handles non-Error object rejection', async () => {
   mockSupersetClientGet.mockRejectedValue('String error');
 
-  const { result, waitForNextUpdate } = renderHook(() =>
-    useDeckLayerMetadata([1]),
-  );
+  const { result } = renderHook(() => useDeckLayerMetadata([1]));
 
-  await waitForNextUpdate();
+  await waitFor(() => expect(result.current.isLoading).toBe(false));
 
   expect(result.current.isLoading).toBe(false);
   expect(result.current.error).toBe('Unknown error');
@@ -125,25 +119,23 @@ test('refetches when sliceIds change', async () => {
     .mockResolvedValueOnce(mockResponse1)
     .mockResolvedValueOnce(mockResponse2);
 
-  const { result, rerender, waitForNextUpdate } = renderHook(
+  const { result, rerender } = renderHook(
     ({ ids }) => useDeckLayerMetadata(ids),
     {
       initialProps: { ids: [1] },
     },
   );
 
-  await waitForNextUpdate();
+  await waitFor(() => expect(result.current.layers).toHaveLength(1));
 
   expect(result.current.isLoading).toBe(false);
-  expect(result.current.layers).toHaveLength(1);
   expect(result.current.layers[0].sliceId).toBe(1);
 
   rerender({ ids: [2, 3] });
 
-  await waitForNextUpdate();
+  await waitFor(() => expect(result.current.layers).toHaveLength(2));
 
   expect(result.current.isLoading).toBe(false);
-  expect(result.current.layers).toHaveLength(2);
   expect(result.current.layers[0].sliceId).toBe(2);
   expect(result.current.layers[1].sliceId).toBe(3);
   expect(mockSupersetClientGet).toHaveBeenCalledTimes(2);
@@ -157,11 +149,9 @@ test('handles empty result from API', async () => {
   };
   mockSupersetClientGet.mockResolvedValue(mockResponse);
 
-  const { result, waitForNextUpdate } = renderHook(() =>
-    useDeckLayerMetadata([1, 2]),
-  );
+  const { result } = renderHook(() => useDeckLayerMetadata([1, 2]));
 
-  await waitForNextUpdate();
+  await waitFor(() => expect(result.current.isLoading).toBe(false));
 
   expect(result.current.isLoading).toBe(false);
   expect(result.current.layers).toEqual([]);
@@ -176,14 +166,14 @@ test('does not refetch when sliceIds array has same values', async () => {
   };
   mockSupersetClientGet.mockResolvedValue(mockResponse);
 
-  const { result, rerender, waitForNextUpdate } = renderHook(
+  const { result, rerender } = renderHook(
     ({ ids }) => useDeckLayerMetadata(ids),
     {
       initialProps: { ids: [1] },
     },
   );
 
-  await waitForNextUpdate();
+  await waitFor(() => expect(result.current.isLoading).toBe(false));
 
   expect(result.current.isLoading).toBe(false);
 

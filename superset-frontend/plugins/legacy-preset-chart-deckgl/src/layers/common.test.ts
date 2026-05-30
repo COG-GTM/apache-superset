@@ -18,6 +18,7 @@
  */
 
 import { PickingInfo } from '@deck.gl/core';
+import type { ReactNode } from 'react';
 import { JsonObject, QueryFormData } from '@superset-ui/core';
 import {
   getAggFunc,
@@ -100,7 +101,7 @@ describe('commonLayerProps', () => {
   const mockSetTooltip = jest.fn();
   const mockSetTooltipContent = jest.fn(
     () => (o: JsonObject) => `Tooltip for ${o}`,
-  );
+  ) as unknown as jest.Mock<ReactNode, [JsonObject]>;
   const mockOnSelect = jest.fn();
 
   test('returns correct props when js_tooltip is provided', () => {

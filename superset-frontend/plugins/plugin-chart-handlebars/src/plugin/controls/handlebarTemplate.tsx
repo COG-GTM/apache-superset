@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import type { ReactNode } from 'react';
 import {
   ControlSetItem,
   CustomControlConfig,
@@ -71,7 +72,7 @@ ${helperDescriptions
     <div>
       <ControlHeader>
         <div>
-          {props.label}
+          {props.label as ReactNode}
           <InfoTooltip
             iconStyle={{ marginLeft: theme.sizeUnit }}
             tooltip={<SafeMarkdown source={helpersTooltipContent} />}

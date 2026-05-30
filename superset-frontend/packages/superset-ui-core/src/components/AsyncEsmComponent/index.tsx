@@ -19,10 +19,10 @@
 import {
   useEffect,
   useState,
-  RefObject,
   forwardRef,
   ComponentType,
   ForwardRefExoticComponent,
+  ForwardRefRenderFunction,
   PropsWithoutRef,
   RefAttributes,
 } from 'react';
@@ -97,10 +97,10 @@ export function AsyncEsmComponent<
     preload?: typeof waitForPromise;
   };
 
-  const AsyncComponent: AsyncComponent = forwardRef(function AsyncComponent(
-    props: FullProps,
-    ref: RefObject<ComponentType<FullProps>>,
-  ) {
+  const renderAsyncComponent: ForwardRefRenderFunction<
+    ComponentType<FullProps>,
+    PropsWithoutRef<FullProps>
+  > = (props, ref) => {
     const [loaded, setLoaded] = useState(component !== undefined);
     useEffect(() => {
       let isMounted = true;
@@ -122,7 +122,8 @@ export function AsyncEsmComponent<
       // @ts-expect-error: Suppress TypeScript error for ref assignment
       <Component ref={Component === component ? ref : null} {...props} />
     ) : null;
-  });
+  };
+  const AsyncComponent = forwardRef(renderAsyncComponent) as AsyncComponent;
   // preload the async component before rendering
   AsyncComponent.preload = waitForPromise;
 

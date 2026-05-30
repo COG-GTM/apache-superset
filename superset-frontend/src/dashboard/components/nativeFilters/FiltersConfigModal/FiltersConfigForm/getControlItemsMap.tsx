@@ -121,7 +121,9 @@ export default function getControlItemsMap({
             initialValue={initColumn}
             label={
               <StyledLabel>
-                {mainControlItem.config?.label || t('Column')}
+                {(typeof mainControlItem.config?.label === 'function'
+                  ? undefined
+                  : mainControlItem.config?.label) || t('Column')}
               </StyledLabel>
             }
             rules={[
@@ -220,13 +222,17 @@ export default function getControlItemsMap({
                 }}
               >
                 <>
-                  {controlItem.config.label}&nbsp;
-                  {controlItem.config.description && (
-                    <InfoTooltip
-                      placement="top"
-                      tooltip={controlItem.config.description}
-                    />
-                  )}
+                  {typeof controlItem.config.label === 'function'
+                    ? null
+                    : controlItem.config.label}
+                  &nbsp;
+                  {controlItem.config.description &&
+                    typeof controlItem.config.description !== 'function' && (
+                      <InfoTooltip
+                        placement="top"
+                        tooltip={controlItem.config.description}
+                      />
+                    )}
                 </>
               </Checkbox>
             </StyledRowFormItem>

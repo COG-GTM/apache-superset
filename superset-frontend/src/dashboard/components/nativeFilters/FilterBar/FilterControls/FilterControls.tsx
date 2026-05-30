@@ -70,6 +70,7 @@ import { FiltersOutOfScopeCollapsible } from '../FiltersOutOfScopeCollapsible';
 import { CustomizationsOutOfScopeCollapsible } from '../CustomizationsOutOfScopeCollapsible';
 import { useFilterControlFactory } from '../useFilterControlFactory';
 import { FiltersDropdownContent } from '../FiltersDropdownContent';
+import { type CrossFilterIndicator } from 'src/dashboard/components/nativeFilters/selectors';
 import crossFiltersSelector from '../CrossFilters/selectors';
 import CrossFilter from '../CrossFilters/CrossFilter';
 import { useFilterOutlined } from '../useFilterOutlined';
@@ -448,13 +449,17 @@ const FilterControls: FC<FilterControlsProps> = ({
   }, [overflowedCrossFilters, overflowedFiltersInScope]);
 
   const rendererCrossFilter = useCallback(
-    (crossFilter, orientation, last) => (
+    (
+      crossFilter: CrossFilterIndicator,
+      orientation: FilterBarOrientation,
+      last: CrossFilterIndicator | undefined,
+    ) => (
       <CrossFilter
         filter={crossFilter}
         orientation={orientation}
         last={
           filtersInScope.length > 0 &&
-          `${last.name}${last.emitterId}` ===
+          `${last?.name}${last?.emitterId}` ===
             `${crossFilter.name}${crossFilter.emitterId}`
         }
       />

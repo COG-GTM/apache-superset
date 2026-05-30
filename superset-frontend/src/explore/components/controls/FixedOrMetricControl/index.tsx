@@ -21,7 +21,9 @@ import { t } from '@apache-superset/core/translation';
 import { Collapse, Label } from '@superset-ui/core/components';
 import TextControl from 'src/explore/components/controls/TextControl';
 import MetricsControl from 'src/explore/components/controls/MetricControl/MetricsControl';
-import ControlHeader from 'src/explore/components/ControlHeader';
+import ControlHeader, {
+  ControlHeaderProps,
+} from 'src/explore/components/ControlHeader';
 import PopoverSection from '@superset-ui/core/components/PopoverSection';
 
 const controlTypes = {
@@ -50,7 +52,7 @@ interface DatasourceType {
   [key: string]: unknown;
 }
 
-interface FixedOrMetricControlProps {
+interface FixedOrMetricControlProps extends ControlHeaderProps {
   onChange?: (value: ControlValue) => void;
   value?: ControlValue;
   isFloat?: boolean;

@@ -53,7 +53,7 @@ import { SearchOutlined } from '@ant-design/icons';
 import { debounce, isEqual } from 'lodash';
 import Pagination from './components/Pagination';
 import SearchSelectDropdown from './components/SearchSelectDropdown';
-import { SearchOption, SortByItem } from '../types';
+import { SearchOption, SortByItem, SortState } from '../types';
 import getInitialSortState, { shouldSort } from '../utils/getInitialSortState';
 import getInitialFilterModel from '../utils/getInitialFilterModel';
 import { PAGE_SIZE_OPTIONS } from '../consts';
@@ -244,7 +244,7 @@ const AgGridDataTable: FunctionComponent<AgGridTableProps> = memo(
       [serverPagination, debouncedSearch, searchId],
     );
 
-    const handleColSort = (colId: string, sortDir: string) => {
+    const handleColSort = (colId: string, sortDir: string | null) => {
       const isSortable = shouldSort({
         colId,
         sortDir,
@@ -298,7 +298,7 @@ const AgGridDataTable: FunctionComponent<AgGridTableProps> = memo(
     };
 
     const handleColumnHeaderClick = useCallback(
-      params => {
+      (params: { column: SortState }) => {
         const colId = params?.column?.colId;
         const sortDir = params?.column?.sort;
         handleColSort(colId, sortDir);

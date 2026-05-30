@@ -16,6 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+import type { ReactNode } from 'react';
 import {
   ControlSetItem,
   CustomControlConfig,
@@ -47,7 +48,7 @@ const StyleControl = (props: CustomControlConfig<StyleCustomControlProps>) => {
     <div>
       <ControlHeader>
         <div>
-          {props.label}
+          {props.label as ReactNode}
           <InfoTooltip
             iconStyle={{ marginLeft: theme.sizeUnit }}
             tooltip={t('You need to configure HTML sanitization to use CSS')}

@@ -16,13 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { useMemo, FC, ReactElement } from 'react';
+import { useMemo, FC, type PropsWithChildren, ReactElement } from 'react';
 
 import { t } from '@apache-superset/core/translation';
 import { styled, useTheme, SupersetTheme } from '@apache-superset/core/theme';
 
 import { Button, DropdownButton } from '@superset-ui/core/components';
-import { IconType, Icons } from '@superset-ui/core/components/Icons';
+import { Icons } from '@superset-ui/core/components/Icons';
 import { detectOS } from 'src/utils/common';
 import { QueryButtonProps } from 'src/SqlLab/types';
 import useQueryEditor from 'src/SqlLab/hooks/useQueryEditor';
@@ -45,9 +45,9 @@ const buildTextAndIcon = (
   shouldShowStopButton: boolean,
   selectedText: string | undefined,
   theme: SupersetTheme,
-): { text: string; icon?: IconType } => {
+): { text: string; icon?: ReactElement } => {
   let text = t('Run');
-  let icon: IconType | undefined = <Icons.CaretRightOutlined />;
+  let icon: ReactElement | undefined = <Icons.CaretRightOutlined />;
   if (selectedText) {
     text = t('Run selection');
     icon = <Icons.StepForwardOutlined />;
@@ -110,9 +110,8 @@ const RunQueryActionButton = ({
   const shouldShowStopBtn =
     !!queryState && ['running', 'pending'].indexOf(queryState) > -1;
 
-  const ButtonComponent: FC<QueryButtonProps> = overlayCreateAsMenu
-    ? (DropdownButton as FC)
-    : Button;
+  const ButtonComponent: FC<PropsWithChildren<QueryButtonProps>> =
+    overlayCreateAsMenu ? (DropdownButton as FC) : Button;
 
   const sqlContent = selectedText || sql || '';
   const isDisabled = !sqlContent

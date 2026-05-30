@@ -20,7 +20,7 @@ import { getExtensionsRegistry } from '@superset-ui/core';
 import { Provider as ReduxProvider } from 'react-redux';
 import { QueryParamProvider } from 'use-query-params';
 import { ReactRouter5Adapter } from 'use-query-params/adapters/react-router-5';
-import { DndProvider } from 'react-dnd';
+import { DndProvider } from 'src/utils/DndProvider';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DynamicPluginProvider } from 'src/components';
 import { EmbeddedUiConfigProvider } from 'src/components/UiConfigContext';
@@ -59,7 +59,9 @@ export const getThemeController = (): ThemeController => themeController;
 
 const extensionsRegistry = getExtensionsRegistry();
 
-export const EmbeddedContextProviders: React.FC = ({ children }) => {
+export const EmbeddedContextProviders: React.FC<React.PropsWithChildren> = ({
+  children,
+}) => {
   const RootContextProviderExtension = extensionsRegistry.get(
     'root.context.provider',
   );

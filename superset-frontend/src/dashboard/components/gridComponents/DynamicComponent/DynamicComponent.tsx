@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-import { FC, Suspense } from 'react';
+import { FC, type Key, Suspense } from 'react';
 import { t } from '@apache-superset/core/translation';
 import { DashboardComponentMetadata, JsonObject } from '@superset-ui/core';
 import backgroundStyleOptions from 'src/dashboard/util/backgroundStyleOptions';
@@ -88,7 +88,7 @@ const DynamicComponent: FC<DynamicComponentProps> = ({
     opt => opt.value === (component.meta.background || BACKGROUND_TRANSPARENT),
   );
 
-  const updateMeta = (metaKey: string, nextValue: string | number) => {
+  const updateMeta = (metaKey: string, nextValue: Key) => {
     updateComponents({
       [component.id]: {
         ...component,
