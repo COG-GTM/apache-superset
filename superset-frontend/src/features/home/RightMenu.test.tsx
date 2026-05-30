@@ -377,9 +377,9 @@ test('If there is NOT a DB with allow_file_upload set as True the option should 
   await userEvent.hover(dropdown);
   const dataMenu = await screen.findByText(dropdownItems[0].label);
   await userEvent.hover(dataMenu);
-  const csvMenu = await screen.findByRole('menuitem', {
-    name: 'Upload CSV to database',
-  });
+  const csvMenuLabel = await screen.findByText('Upload CSV to database');
+  // eslint-disable-next-line testing-library/no-node-access
+  const csvMenu = csvMenuLabel.closest('[role="menuitem"]');
   expect(csvMenu).toBeInTheDocument();
   expect(csvMenu).toHaveAttribute('aria-disabled', 'true');
 });

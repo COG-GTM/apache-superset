@@ -104,14 +104,14 @@ test('accepts an edited metric from an AdhocMetricEditPopover', async () => {
   });
 
   const metricLabel = screen.getByText('SUM(value)');
-  userEvent.click(metricLabel);
+  await userEvent.click(metricLabel);
 
   await screen.findByText('aggregate');
-  selectOption('AVG', 'Select aggregate options');
+  await selectOption('AVG', 'Select aggregate options');
 
   await screen.findByText('AVG(value)');
 
-  userEvent.click(screen.getByRole('button', { name: /save/i }));
+  await userEvent.click(screen.getByRole('button', { name: /save/i }));
 
   expect(onChange).toHaveBeenCalledWith([
     expect.objectContaining({
