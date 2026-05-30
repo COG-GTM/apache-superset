@@ -23,6 +23,7 @@ import {
   screen,
   fireEvent,
   userEvent,
+  waitFor,
   RenderResult,
 } from 'spec/helpers/testing-library';
 import { supersetTheme } from '@apache-superset/core/theme';
@@ -195,55 +196,39 @@ test('should call updateComponents when switching from edit to preview with chan
   });
 
   // Enter edit mode and change content
-  await act(async () => {
-    const markdownHolder = screen.getByTestId(
-      'dashboard-component-chart-holder',
-    );
-    fireEvent.click(markdownHolder);
+  const markdownHolder = screen.getByTestId('dashboard-component-chart-holder');
+  fireEvent.click(markdownHolder);
 
-    // Wait for editor to be fully mounted
-    await new Promise(resolve => setTimeout(resolve, 50));
+  // Wait for editor to be fully mounted
+  const editor = await screen.findByRole('textbox');
 
-    // Find the actual textarea element
-    const editor = screen.getByRole('textbox');
+  // Simulate direct input
+  fireEvent.input(editor, { target: { value: mockCode } });
 
-    if (editor) {
-      // Simulate direct input
-      fireEvent.input(editor, { target: { value: mockCode } });
+  // Force blur and change events
+  fireEvent.change(editor, { target: { value: mockCode } });
+  fireEvent.blur(editor);
 
-      // Force blur and change events
-      fireEvent.change(editor, { target: { value: mockCode } });
-      fireEvent.blur(editor);
-    }
+  // Click the Edit dropdown button
+  const editDropdown = screen.getByText('Edit');
+  fireEvent.click(editDropdown);
 
-    // Wait for state update
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    // Click the Edit dropdown button
-    const editDropdown = screen.getByText('Edit');
-    fireEvent.click(editDropdown);
-
-    // Wait for dropdown to open
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    // Find and click preview in dropdown
-    const previewOption = await screen.findByText(/preview/i);
-    fireEvent.click(previewOption);
-
-    // Wait for update to complete
-    await new Promise(resolve => setTimeout(resolve, 50));
-  });
+  // Find and click preview in dropdown
+  const previewOption = await screen.findByText(/preview/i);
+  fireEvent.click(previewOption);
 
   // Update assertion to match actual component structure
-  expect(updateComponents).toHaveBeenCalledWith({
-    test: {
-      id: 'test',
-      meta: { code: mockCode },
-      type: 'MARKDOWN',
-      children: [],
-      parents: [],
-    },
-  });
+  await waitFor(() =>
+    expect(updateComponents).toHaveBeenCalledWith({
+      test: {
+        id: 'test',
+        meta: { code: mockCode },
+        type: 'MARKDOWN',
+        children: [],
+        parents: [],
+      },
+    }),
+  );
 });
 
 test('should show placeholder text when markdown is empty', async () => {
