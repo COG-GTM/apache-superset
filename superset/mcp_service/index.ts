@@ -44,8 +44,9 @@ class SupersetMCPServer {
   }
 
   start(): void {
-    // The bin script handles the execution
-    require('./bin/superset-mcp.js');
+    // The bin script handles the execution. This file is compiled to
+    // dist/index.js, so the bin path is resolved relative to dist/.
+    require('../bin/superset-mcp.js');
   }
 
   stop(): void {
