@@ -65,9 +65,9 @@ class SupersetMCPServer {
     }
 
     start(): void {
-        // Loading the runner script handles execution as a side effect. It is
-        // resolved relative to the package root so this works whether the
-        // module is loaded from source or from the compiled output directory.
+        // Loading the runner script handles execution as a side effect. The
+        // path is resolved one level up from __dirname because the compiled
+        // output lives in the dist/ subdirectory of the package root.
         require(path.join(__dirname, '..', 'bin', 'superset-mcp.js'));
     }
 
