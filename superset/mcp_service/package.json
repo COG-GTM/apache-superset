@@ -2,7 +2,7 @@
   "name": "@superset/mcp-server",
   "version": "1.0.0",
   "description": "Apache Superset MCP (Model Context Protocol) Server",
-  "main": "index.js",
+  "main": "index.ts",
   "bin": {
     "superset-mcp": "./bin/superset-mcp.js"
   },
