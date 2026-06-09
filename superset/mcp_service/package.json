@@ -2,11 +2,18 @@
   "name": "@superset/mcp-server",
   "version": "1.0.0",
   "description": "Apache Superset MCP (Model Context Protocol) Server",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bin": {
     "superset-mcp": "./bin/superset-mcp.js"
   },
+  "files": [
+    "dist",
+    "bin"
+  ],
   "scripts": {
+    "build": "tsc",
+    "prepare": "tsc",
     "start": "node bin/superset-mcp.js",
     "stdio": "node bin/superset-mcp.js --stdio",
     "http": "node bin/superset-mcp.js --http"
@@ -30,6 +37,9 @@
     "node": ">=18.0.0"
   },
   "dependencies": {},
-  "devDependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.5"
+  },
   "preferGlobal": false
 }
