@@ -25,10 +25,10 @@
 
 import type { ChildProcess } from 'child_process';
 
-export type Transport = 'http' | 'stdio';
+type TransportType = 'http' | 'stdio';
 
-export interface SupersetMCPServerOptions {
-  transport?: Transport;
+interface ServerOptions {
+  transport?: TransportType;
   host?: string;
   port?: number;
   debug?: boolean;
@@ -38,11 +38,11 @@ export interface SupersetMCPServerOptions {
 }
 
 class SupersetMCPServer {
-  options: Required<SupersetMCPServerOptions>;
+  options: Required<ServerOptions>;
 
   process: ChildProcess | null;
 
-  constructor(options: SupersetMCPServerOptions = {}) {
+  constructor(options: ServerOptions = {}) {
     this.options = {
       transport: options.transport || 'http',
       host: options.host || '127.0.0.1',
@@ -69,4 +69,9 @@ class SupersetMCPServer {
   }
 }
 
-export default SupersetMCPServer;
+namespace SupersetMCPServer {
+  export type Transport = TransportType;
+  export type SupersetMCPServerOptions = ServerOptions;
+}
+
+export = SupersetMCPServer;
