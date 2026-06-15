@@ -1,0 +1,7 @@
+# Node module dependencies
+node_modules/
+
+# TypeScript build artifacts (compiled from index.ts)
+/index.js
+/index.d.ts
+*.tsbuildinfo
