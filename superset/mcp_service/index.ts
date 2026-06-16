@@ -23,11 +23,35 @@
  * Entry point for the MCP server when used as a Node.js module.
  */
 
-const { spawn } = require('child_process');
-const path = require('path');
+import type { ChildProcess } from 'child_process';
+import * as path from 'path';
+
+interface SupersetMCPServerOptions {
+    transport?: string;
+    host?: string;
+    port?: number;
+    debug?: boolean;
+    pythonPath?: string | null;
+    supersetRoot?: string | null;
+    configPath?: string | null;
+}
+
+interface ResolvedSupersetMCPServerOptions {
+    transport: string;
+    host: string;
+    port: number;
+    debug: boolean;
+    pythonPath: string | null;
+    supersetRoot: string | null;
+    configPath: string | null;
+}
 
 class SupersetMCPServer {
-    constructor(options = {}) {
+    private readonly options: ResolvedSupersetMCPServerOptions;
+
+    private process: ChildProcess | null;
+
+    constructor(options: SupersetMCPServerOptions = {}) {
         this.options = {
             transport: options.transport || 'http',
             host: options.host || '127.0.0.1',
@@ -40,12 +64,13 @@ class SupersetMCPServer {
         this.process = null;
     }
 
-    start() {
-        const runner = require('./bin/superset-mcp.js');
-        // The bin script handles the execution
+    start(): void {
+        // The bin script handles the execution. Resolve it relative to the
+        // package root so the lookup works from the compiled output directory.
+        require(path.join(__dirname, '..', 'bin', 'superset-mcp.js'));
     }
 
-    stop() {
+    stop(): void {
         if (this.process) {
             this.process.kill();
             this.process = null;
@@ -53,4 +78,4 @@ class SupersetMCPServer {
     }
 }
 
-module.exports = SupersetMCPServer;
+export = SupersetMCPServer;
