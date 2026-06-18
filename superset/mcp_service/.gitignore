@@ -1,0 +1,7 @@
+# Node dependencies
+node_modules/
+
+# Compiled TypeScript output (generated from index.ts via `npm run build`)
+index.js
+index.d.ts
+*.tsbuildinfo
