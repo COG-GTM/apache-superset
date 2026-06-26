@@ -19,7 +19,10 @@
 
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from superset.connectors.sqla.models import SqlaTable
+from superset.exceptions import SupersetSecurityException
 from superset.utils.core import SqlExpressionType
 
 
@@ -34,7 +37,9 @@ class TestValidateExpression:
         self.table.catalog = None
         self.table.database = MagicMock()
         self.table.database.db_engine_spec = MagicMock()
+        self.table.database.db_engine_spec.engine = "postgresql"
         self.table.database.db_engine_spec.make_sqla_column_compatible = lambda x, _: x
+        self.table.database.get_default_schema = MagicMock(return_value="public")
         self.table.columns = []
 
         # Mock get_from_clause to return a simple table
@@ -105,10 +110,7 @@ class TestValidateExpression:
 
     @patch("superset.connectors.sqla.models.SqlaTable._execute_validation_query")
     def test_validate_invalid_expression(self, mock_execute):
-        """Test validation of invalid SQL expressions"""
-        # Mock _execute_validation_query to raise an exception
-        mock_execute.side_effect = Exception("Invalid SQL syntax")
-
+        """Malformed SQL is rejected by sanitization before it is ever executed"""
         result = self.table.validate_expression(
             expression="INVALID SQL HERE",
             expression_type=SqlExpressionType.COLUMN,
@@ -116,7 +118,42 @@ class TestValidateExpression:
 
         assert result["valid"] is False
         assert len(result["errors"]) == 1
-        assert "Invalid SQL syntax" in result["errors"][0]["message"]
+        assert result["errors"][0]["message"]
+        # The expression is rejected at the parse stage, so it never reaches
+        # execution against the analytics database.
+        mock_execute.assert_not_called()
+
+    @patch("superset.connectors.sqla.models.SqlaTable._execute_validation_query")
+    def test_validate_expression_blocks_subquery(self, mock_execute):
+        """Sub-queries are blocked (RLS bypass) and never executed by default"""
+        result = self.table.validate_expression(
+            expression="id IN (SELECT user_id FROM other_tenant_secrets)",
+            expression_type=SqlExpressionType.WHERE,
+        )
+
+        assert result["valid"] is False
+        assert len(result["errors"]) == 1
+        assert "sub-quer" in result["errors"][0]["message"].lower()
+        mock_execute.assert_not_called()
+
+    @patch("superset.connectors.sqla.models.SqlaTable._execute_validation_query")
+    def test_validate_expression_blocks_stacked_statements(self, mock_execute):
+        """Multi-statement (stacked query) expressions are rejected, not executed"""
+        result = self.table.validate_expression(
+            expression="1=1); DROP TABLE users; --",
+            expression_type=SqlExpressionType.WHERE,
+        )
+
+        assert result["valid"] is False
+        assert len(result["errors"]) == 1
+        mock_execute.assert_not_called()
+
+    def test_sanitize_validation_expression_raises_on_subquery(self):
+        """The sanitization helper raises for disallowed sub-queries"""
+        with pytest.raises(SupersetSecurityException):
+            self.table._sanitize_validation_expression(
+                "id IN (SELECT user_id FROM other_tenant_secrets)"
+            )
 
     @patch("superset.connectors.sqla.models.SqlaTable._execute_validation_query")
     def test_validate_having_with_non_aggregated_column(self, mock_execute):
