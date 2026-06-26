@@ -2505,6 +2505,14 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
             tp = self.get_template_processor()
             processed_expression = self._process_expression_template(expression, tp)
 
+            # Apply the same guards as the primary adhoc path before the
+            # expression is ever embedded in a query or executed: block
+            # disallowed sub-queries (enforcing RLS on any referenced tables)
+            # and reject malformed/multi-statement SQL while stripping comments.
+            processed_expression = self._sanitize_validation_expression(
+                processed_expression
+            )
+
             # Build validation query
             tbl, cte = self.get_from_clause(tp)
             validation_query = self._build_validation_query(
@@ -2539,6 +2547,38 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
 
         if hasattr(tp, "process_template"):
             return tp.process_template(expression)
+        return expression
+
+    def _sanitize_validation_expression(self, expression: str) -> str:
+        """
+        Run a user-supplied validation expression through the same security
+        guards as the primary adhoc-expression path (``_process_sql_expression``).
+
+        This enforces sub-query/RLS rules via :func:`validate_adhoc_subquery`
+        and rejects malformed or multi-statement SQL (and strips comments) via
+        :func:`sanitize_clause`, preventing the validation endpoint from being
+        used to bypass RLS or run stacked queries.
+
+        :raises SupersetSecurityException: if disallowed sub-queries are present
+        :raises QueryObjectValidationError: if the clause is malformed
+        """
+        if not expression:
+            return expression
+
+        engine = self.db_engine_spec.engine
+        schema = self.schema or self.database.get_default_schema(self.catalog) or ""
+
+        expression = validate_adhoc_subquery(
+            expression,
+            self.database,
+            self.catalog,
+            schema,
+            engine,
+        )
+        try:
+            expression = sanitize_clause(expression, engine)
+        except QueryClauseValidationException as ex:
+            raise QueryObjectValidationError(ex.message) from ex
         return expression
 
     def _build_validation_query(
