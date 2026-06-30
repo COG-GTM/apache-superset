@@ -63,7 +63,7 @@ class SupersetMCPServer {
   }
 
   start(): void {
-    require('./bin/superset-mcp.js');
+    require('../bin/superset-mcp.js');
   }
 
   stop(): void {
@@ -74,5 +74,4 @@ class SupersetMCPServer {
   }
 }
 
-export default SupersetMCPServer;
-module.exports = SupersetMCPServer;
+export = SupersetMCPServer;
