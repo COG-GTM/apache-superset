@@ -69,6 +69,13 @@ class TestAsyncEventApi(SupersetTestCase):
         mock_xrange.assert_called_with(channel_id, "1607471525180-1", "+", 100)
         assert response == {"result": []}
 
+    def _test_events_invalid_last_id_logic(self, mock_cache):
+        with mock.patch.object(mock_cache, "xrange") as mock_xrange:
+            rv = self.fetch_events("not-an-event-id")
+
+        assert rv.status_code == 400
+        mock_xrange.assert_not_called()
+
     def _test_events_results_logic(self, mock_cache):
         with mock.patch.object(mock_cache, "xrange") as mock_xrange:
             mock_xrange.return_value = [
@@ -123,6 +130,12 @@ class TestAsyncEventApi(SupersetTestCase):
     def test_events_redis_sentinel_cache_backend(self, mock_uuid4):
         self.run_test_with_cache_backend(
             RedisSentinelCacheBackend, self._test_events_logic
+        )
+
+    @mock.patch("uuid.uuid4", return_value=UUID)
+    def test_events_invalid_last_id(self, mock_uuid4):
+        self.run_test_with_cache_backend(
+            RedisCacheBackend, self._test_events_invalid_last_id_logic
         )
 
     def test_events_no_login(self):

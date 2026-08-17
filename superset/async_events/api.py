@@ -15,6 +15,7 @@
 # specific language governing permissions and limitations
 # under the License.
 import logging
+import re
 
 from flask import request, Response
 from flask_appbuilder import expose
@@ -26,6 +27,9 @@ from superset.extensions import async_query_manager, event_logger
 from superset.views.base_api import BaseSupersetApi, statsd_metrics
 
 logger = logging.getLogger(__name__)
+
+# Redis stream entry IDs are in the format '<milliseconds>-<sequence>'
+EVENT_ID_REGEX = re.compile(r"\d+-\d+")
 
 
 class AsyncEventsRestApi(BaseSupersetApi):
@@ -83,6 +87,8 @@ class AsyncEventsRestApi(BaseSupersetApi):
                                     type: object
                                 result_url:
                                   type: string
+            400:
+              $ref: '#/components/responses/400'
             401:
               $ref: '#/components/responses/401'
             500:
@@ -93,6 +99,8 @@ class AsyncEventsRestApi(BaseSupersetApi):
                 request
             )
             last_event_id = request.args.get("last_id")
+            if last_event_id and not EVENT_ID_REGEX.fullmatch(last_event_id):
+                return self.response_400(message="Invalid last_id")
             events = async_query_manager.read_events(async_channel_id, last_event_id)
 
         except AsyncQueryTokenException:
