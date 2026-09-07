@@ -75,3 +75,23 @@ def is_secure_url(url: str) -> bool:
     """
     parsed_url = urlparse(url)
     return parsed_url.scheme == "https"
+
+
+def is_safe_redirect_target(url: str) -> bool:
+    """
+    Validates that a URL is acceptable as a redirect target: either a
+    same-origin relative path or an absolute http(s) URL. Rejects
+    protocol-relative URLs and non-web schemes such as ``javascript:``.
+
+    :param url: The URL to validate.
+    :return: True if the URL may be used as a redirect target.
+    """
+    if not url:
+        return False
+    stripped = url.strip()
+    if stripped.startswith(("//", "\\\\")):
+        return False
+    parsed = urlparse(stripped)
+    if not parsed.scheme:
+        return not parsed.netloc
+    return parsed.scheme.lower() in ("http", "https") and bool(parsed.netloc)

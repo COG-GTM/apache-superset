@@ -29,6 +29,7 @@ from superset import is_feature_enabled
 from superset.daos.user import UserDAO
 from superset.extensions import db, event_logger
 from superset.utils.slack import get_user_avatar, SlackClientError
+from superset.utils.urls import is_safe_redirect_target
 from superset.views.base_api import BaseSupersetApi, requires_json, statsd_metrics
 from superset.views.users.schemas import CurrentUserPutSchema, UserResponseSchema
 from superset.views.utils import bootstrap_user_data
@@ -224,7 +225,7 @@ class UserRestApi(BaseSupersetApi):
             UserDAO.set_avatar_url(user, avatar_url)
 
         # Return a permanent redirect to the avatar URL
-        if avatar_url:
+        if avatar_url and is_safe_redirect_target(avatar_url):
             return redirect(avatar_url, code=301)
 
         # No avatar found, return a "no-content" response

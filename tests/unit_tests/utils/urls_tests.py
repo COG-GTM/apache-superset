@@ -15,7 +15,9 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from superset.utils.urls import modify_url_query
+import pytest
+
+from superset.utils.urls import is_safe_redirect_target, modify_url_query
 
 EXPLORE_CHART_LINK = "http://localhost:9000/explore/?form_data=%7B%22slice_id%22%3A+76%7D&standalone=true&force=false"
 
@@ -38,3 +40,22 @@ def test_convert_dashboard_link() -> None:
 def test_convert_dashboard_link_with_integer() -> None:
     test_url = modify_url_query(EXPLORE_DASHBOARD_LINK, standalone=0)
     assert test_url == "http://localhost:9000/superset/dashboard/3/?standalone=0"
+
+
+@pytest.mark.parametrize(
+    "url,expected",
+    [
+        ("/superset/dashboard/1/", True),
+        ("https://example.com/avatar.png", True),
+        ("http://example.com/", True),
+        ("", False),
+        ("//evil.com/path", False),
+        ("\\\\evil.com", False),
+        ("javascript:alert(1)", False),
+        ("data:text/html,foo", False),
+        ("ftp://example.com/", False),
+        ("https:", False),
+    ],
+)
+def test_is_safe_redirect_target(url: str, expected: bool) -> None:
+    assert is_safe_redirect_target(url) is expected
