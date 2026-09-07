@@ -34,7 +34,7 @@ from superset.models.slice import Slice
 from superset.superset_typing import FlaskResponse
 from superset.utils import json
 from superset.utils.date_parser import get_since_until
-from superset.views.base import api, BaseSupersetView
+from superset.views.base import api, BaseSupersetView, json_success
 from superset.views.error_handling import handle_api_exception
 
 if TYPE_CHECKING:
@@ -73,7 +73,9 @@ class Api(BaseSupersetView):
         query_context.raise_for_access()
         result = query_context.get_payload()
         payload_json = result["queries"]
-        return json.dumps(payload_json, default=json.json_int_dttm_ser, ignore_nan=True)
+        return json_success(
+            json.dumps(payload_json, default=json.json_int_dttm_ser, ignore_nan=True)
+        )
 
     @event_logger.log_this
     @api

@@ -90,6 +90,7 @@ from superset.utils.core import (
     get_user_id,
     ReservedUrlParameters,
 )
+from superset.utils.urls import is_safe_redirect_target
 from superset.views.base import (
     api,
     BaseSupersetView,
@@ -498,7 +499,12 @@ class Superset(BaseSupersetView):
 
         datasource_name = datasource.name if datasource else _("[Missing Dataset]")
         viz_type = form_data.get("viz_type")
-        if not viz_type and datasource and datasource.default_endpoint:
+        if (
+            not viz_type
+            and datasource
+            and datasource.default_endpoint
+            and is_safe_redirect_target(datasource.default_endpoint)
+        ):
             return redirect(datasource.default_endpoint)
 
         selectedColumns = []  # noqa: N806
