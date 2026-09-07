@@ -144,7 +144,7 @@ function processHTML(proxyResponse, response) {
     .on('error', error => {
       // eslint-disable-next-line no-console
       console.error(error);
-      response.end(`Error fetching proxied request: ${error.message}`);
+      response.end('Error fetching proxied request');
     })
     .on('end', () => {
       response.end(toDevHTML(body.toString()));
@@ -207,8 +207,9 @@ module.exports = newManifest => {
         if (!response.headersSent) {
           response.setHeader('content-type', 'text/plain');
         }
-        response.write(`Error requesting ${request.path} from proxy:\n\n`);
-        response.end(e.stack);
+        // eslint-disable-next-line no-console
+        console.error(`Error requesting ${request.path} from proxy:`, e);
+        response.end('Error requesting resource from proxy');
       }
     },
   };
