@@ -26,6 +26,40 @@ var indexRouter = require('./routes/index');
 
 var app = express();
 
+const RATE_LIMIT_WINDOW_MS = 60 * 1000;
+const RATE_LIMIT_MAX_REQUESTS = 300;
+const requestCounts = new Map();
+
+function rateLimit(req, res, next) {
+  const now = Date.now();
+  const key = req.ip;
+  const entry = requestCounts.get(key);
+  if (!entry || now - entry.start > RATE_LIMIT_WINDOW_MS) {
+    requestCounts.set(key, { start: now, count: 1 });
+    return next();
+  }
+  entry.count += 1;
+  if (entry.count > RATE_LIMIT_MAX_REQUESTS) {
+    return next(createError(429));
+  }
+  return next();
+}
+
+function securityHeaders(req, res, next) {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; connect-src 'self' ws://127.0.0.1:8080",
+  );
+  next();
+}
+
+app.disable('x-powered-by');
+app.use(securityHeaders);
+app.use(rateLimit);
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -44,7 +78,8 @@ app.use(function (req, res, next) {
 });
 
 // error handler
-app.use(function (err, req, res) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};

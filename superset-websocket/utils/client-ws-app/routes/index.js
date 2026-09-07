@@ -22,7 +22,11 @@ const jwt = require('jsonwebtoken');
 const config = require('../../../config.json');
 
 router.get('/', function (req, res) {
-  let numTokens = req.query.sockets ? Number(req.query.sockets) : 100;
+  const MAX_TOKENS = 1000;
+  const requested = Number(req.query.sockets);
+  const numTokens = Number.isInteger(requested)
+    ? Math.min(Math.max(requested, 0), MAX_TOKENS)
+    : 100;
   let tokens = [];
   for (let i = 0; i < numTokens; i++) {
     const token = jwt.sign({ channel: String(i) }, config.jwtSecret);
