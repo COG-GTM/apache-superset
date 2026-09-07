@@ -30,7 +30,7 @@
  */
 
 import { createHash } from 'crypto';
-import { execSync, spawn } from 'child_process';
+import { spawn } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -54,7 +54,7 @@ process.env.PATH = `${localBin}${path.delimiter}${process.env.PATH}`;
 const GENERATORS = [
   {
     name: 'superset-components',
-    command: 'node scripts/generate-superset-components.mjs',
+    steps: [['node', 'scripts/generate-superset-components.mjs']],
     inputs: [
       {
         type: 'glob',
@@ -77,7 +77,7 @@ const GENERATORS = [
   },
   {
     name: 'database-docs',
-    command: 'node scripts/generate-database-docs.mjs',
+    steps: [['node', 'scripts/generate-database-docs.mjs']],
     inputs: [
       {
         type: 'glob',
@@ -93,8 +93,13 @@ const GENERATORS = [
   },
   {
     name: 'api-docs',
-    command:
-      'python3 scripts/fix-openapi-spec.py && docusaurus gen-api-docs superset && node scripts/convert-api-sidebar.mjs && node scripts/generate-api-index.mjs && node scripts/generate-api-tag-pages.mjs',
+    steps: [
+      ['python3', 'scripts/fix-openapi-spec.py'],
+      ['docusaurus', 'gen-api-docs', 'superset'],
+      ['node', 'scripts/convert-api-sidebar.mjs'],
+      ['node', 'scripts/generate-api-index.mjs'],
+      ['node', 'scripts/generate-api-tag-pages.mjs'],
+    ],
     inputs: [
       { type: 'file', path: path.join(DOCS_DIR, 'static/resources/openapi.json') },
       { type: 'file', path: path.join(DOCS_DIR, 'scripts/fix-openapi-spec.py') },
@@ -200,6 +205,35 @@ function saveCache(cache) {
 // Main
 // ---------------------------------------------------------------------------
 
+function runStep(name, [cmd, ...args], timeout) {
+  return new Promise((resolve, reject) => {
+    const child = spawn(cmd, args, {
+      cwd: DOCS_DIR,
+      stdio: 'inherit',
+      env: process.env,
+      timeout,
+    });
+    child.on('close', (code) => {
+      if (code === 0) {
+        resolve();
+      } else {
+        console.error(`  ✗ ${name} failed (exit ${code})`);
+        reject(new Error(`${name} failed with exit code ${code}`));
+      }
+    });
+    child.on('error', (err) => {
+      console.error(`  ✗ ${name} failed to start`);
+      reject(err);
+    });
+  });
+}
+
+async function runSteps(gen, timeout) {
+  for (const step of gen.steps) {
+    await runStep(gen.name, step, timeout);
+  }
+}
+
 async function main() {
   const cache = loadCache();
   const updatedCache = { ...cache };
@@ -234,25 +268,8 @@ async function main() {
     console.log(`  ↻ ${gen.name} — ${reason}, regenerating...`);
     ran++;
 
-    return new Promise((resolve, reject) => {
-      const child = spawn('sh', ['-c', gen.command], {
-        cwd: DOCS_DIR,
-        stdio: 'inherit',
-        env: process.env,
-      });
-      child.on('close', (code) => {
-        if (code === 0) {
-          updatedCache[gen.name] = currentHash;
-          resolve();
-        } else {
-          console.error(`  ✗ ${gen.name} failed (exit ${code})`);
-          reject(new Error(`${gen.name} failed with exit code ${code}`));
-        }
-      });
-      child.on('error', (err) => {
-        console.error(`  ✗ ${gen.name} failed to start`);
-        reject(err);
-      });
+    return runSteps(gen).then(() => {
+      updatedCache[gen.name] = currentHash;
     });
   });
 
@@ -278,17 +295,8 @@ async function main() {
     console.log(`  ↻ ${gen.name} — ${reason}, regenerating...`);
     ran++;
 
-    try {
-      execSync(gen.command, {
-        cwd: DOCS_DIR,
-        stdio: 'inherit',
-        timeout: 300_000,
-      });
-      updatedCache[gen.name] = currentHash;
-    } catch (err) {
-      console.error(`  ✗ ${gen.name} failed`);
-      throw err;
-    }
+    await runSteps(gen, 300_000);
+    updatedCache[gen.name] = currentHash;
   }
 
   saveCache(updatedCache);
