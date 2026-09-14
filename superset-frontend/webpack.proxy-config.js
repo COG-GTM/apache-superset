@@ -207,8 +207,9 @@ module.exports = newManifest => {
         if (!response.headersSent) {
           response.setHeader('content-type', 'text/plain');
         }
+        console.error(`Error requesting ${request.path} from proxy:`, e);
         response.write(`Error requesting ${request.path} from proxy:\n\n`);
-        response.end(e.stack);
+        response.end(e.message);
       }
     },
   };

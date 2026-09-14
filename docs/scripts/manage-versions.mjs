@@ -21,7 +21,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -34,6 +34,9 @@ const args = process.argv.slice(2);
 const command = args[0]; // 'add' or 'remove'
 const section = args[1]; // 'docs', 'developer_portal', or 'components'
 const version = args[2]; // version string like '1.2.0'
+
+const VALID_SECTIONS = ['docs', 'developer_portal', 'components'];
+const VERSION_PATTERN = /^\d+\.\d+(\.\d+)?$/;
 
 function loadConfig() {
   return JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
@@ -92,12 +95,12 @@ function addVersion(section, version) {
   console.log(`Creating version ${version} for ${section}...`);
 
   // Run Docusaurus version command
-  const docusaurusCommand = section === 'docs'
-    ? `yarn docusaurus docs:version ${version}`
-    : `yarn docusaurus docs:version:${section} ${version}`;
+  const docusaurusSubcommand = section === 'docs'
+    ? 'docs:version'
+    : `docs:version:${section}`;
 
   try {
-    execSync(docusaurusCommand, { stdio: 'inherit' });
+    execFileSync('yarn', ['docusaurus', docusaurusSubcommand, version], { stdio: 'inherit' });
   } catch (error) {
     console.error(`Failed to create version: ${error.message}`);
     process.exit(1);
@@ -227,6 +230,18 @@ Examples:
 
 // Main execution
 if (!command || !section || !version) {
+  printUsage();
+  process.exit(1);
+}
+
+if (!VALID_SECTIONS.includes(section)) {
+  console.error(`Unknown section: ${section}`);
+  printUsage();
+  process.exit(1);
+}
+
+if (!VERSION_PATTERN.test(version)) {
+  console.error(`Invalid version: ${version}`);
   printUsage();
   process.exit(1);
 }
