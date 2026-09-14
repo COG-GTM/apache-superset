@@ -168,6 +168,17 @@ NATIVE_FILTER_DEFAULT_ROW_LIMIT = 1000
 # max rows retrieved by filter select auto complete
 FILTER_SELECT_ROW_LIMIT = 10000
 
+# Per-datasource query rate limiting. When enabled, at most `max_queries` queries
+# are executed against a single datasource within each `period_seconds` window,
+# across all users. Queries served from the cache are not counted, since they never
+# reach the analytics database. Counters are kept in `CACHE_CONFIG`, so a shared
+# backend such as Redis is required for the limit to apply across workers.
+DATASOURCE_QUERY_RATE_LIMIT: dict[str, Any] = {
+    "enabled": False,
+    "max_queries": 60,
+    "period_seconds": 60,
+}
+
 # SupersetClient HTTP retry configuration
 # Controls retry behavior for all HTTP requests made through SupersetClient
 # This helps handle transient server errors (like 502 Bad Gateway) automatically

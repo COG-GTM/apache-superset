@@ -66,6 +66,7 @@ from sqlalchemy_utils import UUIDType
 from superset import db, is_feature_enabled
 from superset.advanced_data_type.types import AdvancedDataTypeResponse
 from superset.common.db_query_status import QueryStatus
+from superset.common.query_rate_limit import enforce_datasource_query_rate_limit
 from superset.common.utils import dataframe_utils
 from superset.common.utils.time_range_utils import (
     get_since_until_from_query_object,
@@ -1153,6 +1154,7 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
         This method is the unified entry point for query execution across all
         datasource types (Query, SqlaTable, etc.).
         """
+        enforce_datasource_query_rate_limit(self.uid)
         qry_start_dttm = datetime.now()
         query_str_ext = self.get_query_str_extended(query_obj)
         sql = query_str_ext.sql

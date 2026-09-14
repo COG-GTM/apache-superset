@@ -88,6 +88,7 @@ class SupersetErrorType(StrEnum):
     ADHOC_SUBQUERY_NOT_ALLOWED_ERROR = "ADHOC_SUBQUERY_NOT_ALLOWED_ERROR"
     INVALID_SQL_ERROR = "INVALID_SQL_ERROR"
     RESULT_TOO_LARGE_ERROR = "RESULT_TOO_LARGE_ERROR"
+    DATASOURCE_QUERY_RATE_LIMIT_ERROR = "DATASOURCE_QUERY_RATE_LIMIT_ERROR"
 
     # Generic errors
     GENERIC_COMMAND_ERROR = "GENERIC_COMMAND_ERROR"
@@ -153,6 +154,7 @@ ISSUE_CODES = {
     1037: _("Custom SQL fields cannot contain sub-queries."),
     1040: _("The submitted payload failed validation."),
     1041: _("The result size exceeds the allowed limit."),
+    1042: _("Too many queries have been run against this datasource."),
 }
 
 
@@ -193,6 +195,7 @@ ERROR_TYPES_TO_ISSUE_CODES_MAPPING = {
     SupersetErrorType.CONNECTION_DATABASE_TIMEOUT: [1001, 1009],
     SupersetErrorType.MARSHMALLOW_ERROR: [1040],
     SupersetErrorType.RESULT_TOO_LARGE_ERROR: [1041],
+    SupersetErrorType.DATASOURCE_QUERY_RATE_LIMIT_ERROR: [1042],
 }
 
 

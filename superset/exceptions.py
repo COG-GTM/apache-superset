@@ -175,6 +175,22 @@ class SupersetSecurityException(SupersetErrorException):
         self.payload = payload
 
 
+class SupersetRateLimitExceededException(SupersetErrorException):
+    """Raised when a datasource has exceeded its allowed query rate"""
+
+    status = 429
+
+    def __init__(self, message: str, extra: Optional[dict[str, Any]] = None) -> None:
+        super().__init__(
+            SupersetError(
+                error_type=SupersetErrorType.DATASOURCE_QUERY_RATE_LIMIT_ERROR,
+                message=message,
+                level=ErrorLevel.ERROR,
+                extra=extra or {},
+            )
+        )
+
+
 class SupersetVizException(SupersetErrorsException):
     status = 400
 
