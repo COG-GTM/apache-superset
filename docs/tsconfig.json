@@ -18,6 +18,10 @@
       // Runtime resolution uses webpack alias pointing to actual source (see src/webpack.extend.ts)
       // Using /ui path matches the established pattern used throughout the Superset codebase
       "@apache-superset/core/components": ["./src/types/apache-superset-core"],
+      // Subpath export not resolvable under moduleResolution "node"
+      "@docusaurus/plugin-content-docs/client": [
+        "node_modules/@docusaurus/plugin-content-docs/lib/client/index.d.ts"
+      ],
       "*": ["src/*", "node_modules/*"]
     }
   },
