@@ -17,39 +17,46 @@
  * under the License.
  */
 
-import React from 'react';
+import { useEffect, useState } from 'react';
+import type { JSX, MouseEvent } from 'react';
 import {
   useActivePlugin,
+  useDocsPreferredVersion,
   useDocsVersion,
   useVersions,
 } from '@docusaurus/plugin-content-docs/client';
 import { useLocation } from '@docusaurus/router';
-import { useDocsPreferredVersion } from '@docusaurus/theme-common';
 import { Dropdown } from 'antd';
+import type { MenuProps } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
 
 import styles from './styles.module.css';
 
-export default function DocVersionBadge() {
+// Plugin IDs whose docs are versioned and should render the version selector
+const VERSIONED_PLUGIN_IDS = [
+  'default', // main docs
+  'components',
+  'tutorials',
+  'developer_portal',
+];
+
+const VERSION_SEGMENT_PATTERN = /^\d+\.\d+\.\d+$/;
+
+export default function DocVersionBadge(): JSX.Element | null {
   const activePlugin = useActivePlugin();
   const { pathname } = useLocation();
   const pluginId = activePlugin?.pluginId;
-  const [versionedPath, setVersionedPath] = React.useState('');
+  const [versionedPath, setVersionedPath] = useState<string>('');
 
-  // Show version selector for all versioned sections
-  const isVersioned = [
-    'default',  // main docs
-    'components',
-    'tutorials',
-    'developer_portal',
-  ].includes(pluginId);
+  const isVersioned =
+    pluginId !== undefined && VERSIONED_PLUGIN_IDS.includes(pluginId);
 
   const { preferredVersion } = useDocsPreferredVersion(pluginId);
   const versions = useVersions(pluginId);
   const version = useDocsVersion();
 
   // Extract the current page path relative to the version
-  React.useEffect(() => {
+  useEffect(() => {
     if (!pathname || !version || !pluginId) return;
 
     let relativePath = '';
@@ -65,9 +72,14 @@ export default function DocVersionBadge() {
         if (afterBase.startsWith('/')) {
           const segments = afterBase.substring(1).split('/');
           // Check if first segment is a version (e.g., "1.1.0", "next")
-          if (segments[0] && (segments[0].match(/^\d+\.\d+\.\d+$/) || segments[0] === 'next')) {
+          if (
+            segments[0] &&
+            (VERSION_SEGMENT_PATTERN.test(segments[0]) ||
+              segments[0] === 'next')
+          ) {
             // Skip the version segment
-            relativePath = segments.length > 1 ? '/' + segments.slice(1).join('/') : '';
+            relativePath =
+              segments.length > 1 ? `/${segments.slice(1).join('/')}` : '';
           } else {
             // No version in path (e.g., /docs/intro for current version with empty path)
             relativePath = afterBase;
@@ -80,7 +92,7 @@ export default function DocVersionBadge() {
   }, [pathname, version, pluginId]);
 
   // Create dropdown items for version selection
-  const items = versions.map(v => {
+  const items: MenuProps['items'] = versions.map(v => {
     // Construct the URL for this version, preserving the current page
     // v.path contains the full path including base, e.g., "/docs/1.1.0" or "/docs"
     let versionUrl = v.path;
@@ -95,7 +107,7 @@ export default function DocVersionBadge() {
       label: (
         <a href={versionUrl}>
           {v.label}
-          {v.name === version.name && ' (current)'}
+          {v.name === version.version && ' (current)'}
           {v.name === preferredVersion?.name && ' (preferred)'}
         </a>
       ),
@@ -110,7 +122,10 @@ export default function DocVersionBadge() {
     <span className={styles.versionBadge}>
       Version:{' '}
       <Dropdown menu={{ items }} trigger={['click']}>
-        <a onClick={e => e.preventDefault()} className={styles.versionSelector}>
+        <a
+          onClick={(e: MouseEvent<HTMLAnchorElement>) => e.preventDefault()}
+          className={styles.versionSelector}
+        >
           {version.label} <DownOutlined />
         </a>
       </Dropdown>
