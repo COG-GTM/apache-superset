@@ -19,10 +19,25 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
 const config = require('../../../config.json');
 
-router.get('/', function (req, res) {
-  let numTokens = req.query.sockets ? Number(req.query.sockets) : 100;
+const MAX_TOKENS = 1000;
+
+// Token generation is CPU-bound (one JWT signature per socket), so throttle it
+// more tightly than the app-wide limit.
+const tokenLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+router.get('/', tokenLimiter, function (req, res) {
+  const requested = req.query.sockets ? Number(req.query.sockets) : 100;
+  const numTokens = Number.isFinite(requested)
+    ? Math.min(Math.max(Math.floor(requested), 0), MAX_TOKENS)
+    : 100;
   let tokens = [];
   for (let i = 0; i < numTokens; i++) {
     const token = jwt.sign({ channel: String(i) }, config.jwtSecret);

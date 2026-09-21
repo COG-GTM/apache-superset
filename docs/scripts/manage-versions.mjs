@@ -21,7 +21,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -34,6 +34,28 @@ const args = process.argv.slice(2);
 const command = args[0]; // 'add' or 'remove'
 const section = args[1]; // 'docs', 'developer_portal', or 'components'
 const version = args[2]; // version string like '1.2.0'
+
+const VALID_SECTIONS = ['docs', 'developer_portal', 'components'];
+const VERSION_PATTERN = /^[0-9A-Za-z][0-9A-Za-z._-]{0,63}$/;
+const FORBIDDEN_KEYS = ['__proto__', 'constructor', 'prototype'];
+
+function validateSection(sectionName) {
+  if (!VALID_SECTIONS.includes(sectionName) || FORBIDDEN_KEYS.includes(sectionName)) {
+    throw new Error(`Invalid section "${sectionName}". Expected one of: ${VALID_SECTIONS.join(', ')}`);
+  }
+  return sectionName;
+}
+
+function validateVersion(versionName) {
+  if (
+    typeof versionName !== 'string' ||
+    !VERSION_PATTERN.test(versionName) ||
+    FORBIDDEN_KEYS.includes(versionName)
+  ) {
+    throw new Error(`Invalid version "${versionName}". Use only letters, digits, '.', '_' or '-'.`);
+  }
+  return versionName;
+}
 
 function loadConfig() {
   return JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
@@ -75,7 +97,9 @@ function fixVersionedImports(version) {
   });
 }
 
-function addVersion(section, version) {
+function addVersion(rawSection, rawVersion) {
+  const section = validateSection(rawSection);
+  const version = validateVersion(rawVersion);
   const config = loadConfig();
 
   if (!config[section]) {
@@ -92,12 +116,12 @@ function addVersion(section, version) {
   console.log(`Creating version ${version} for ${section}...`);
 
   // Run Docusaurus version command
-  const docusaurusCommand = section === 'docs'
-    ? `yarn docusaurus docs:version ${version}`
-    : `yarn docusaurus docs:version:${section} ${version}`;
+  const docusaurusSubcommand = section === 'docs'
+    ? 'docs:version'
+    : `docs:version:${section}`;
 
   try {
-    execSync(docusaurusCommand, { stdio: 'inherit' });
+    execFileSync('yarn', ['docusaurus', docusaurusSubcommand, version], { stdio: 'inherit' });
   } catch (error) {
     console.error(`Failed to create version: ${error.message}`);
     process.exit(1);
@@ -131,7 +155,9 @@ function addVersion(section, version) {
   console.log(`📝 Updated versions-config.json`);
 }
 
-function removeVersion(section, version) {
+function removeVersion(rawSection, rawVersion) {
+  const section = validateSection(rawSection);
+  const version = validateVersion(rawVersion);
   const config = loadConfig();
 
   if (!config[section]) {

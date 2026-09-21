@@ -207,8 +207,9 @@ module.exports = newManifest => {
         if (!response.headersSent) {
           response.setHeader('content-type', 'text/plain');
         }
-        response.write(`Error requesting ${request.path} from proxy:\n\n`);
-        response.end(e.stack);
+        // eslint-disable-next-line no-console
+        console.error('Error requesting from proxy:', request.path, e);
+        response.end('Error requesting from proxy.');
       }
     },
   };

@@ -233,6 +233,12 @@ if (!versionsConfig.developer_docs.disabled && !versionsConfig.developer_docs.hi
 // the limit. See https://docusaurus.io/blog/releases/3.6#docusaurus-faster
 const isCI = process.env.CI === 'true';
 
+// Algolia DocSearch credentials are public, search-only values by design.
+// They can be overridden for forks/self-hosted docs via env vars.
+const algoliaAppId = process.env.ALGOLIA_APP_ID || 'WR5FASX5ED';
+const algoliaSearchApiKey =
+  process.env.ALGOLIA_SEARCH_API_KEY || 'd0d22810f2e9b614ffac3a73b26891fe';
+
 const config: Config = {
   ...(!isCI && {
     future: {
@@ -802,8 +808,8 @@ const config: Config = {
       respectPrefersColorScheme: true,
     },
     algolia: {
-      appId: 'WR5FASX5ED',
-      apiKey: 'd0d22810f2e9b614ffac3a73b26891fe',
+      appId: algoliaAppId,
+      apiKey: algoliaSearchApiKey,
       indexName: 'superset-apache',
     },
     mermaid: {

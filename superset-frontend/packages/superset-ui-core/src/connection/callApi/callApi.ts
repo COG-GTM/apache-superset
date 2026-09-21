@@ -156,7 +156,8 @@ export default async function callApi({
             } catch (e) {
               // eslint-disable-next-line no-console
               console.error(
-                `Unable to convert attribute '${key}' to a String(). '${key}' was not added to the formData in request.body for call to ${url}`,
+                'Unable to convert attribute to a String(). Attribute was not added to the formData in request.body.',
+                { key, url },
                 value,
                 e,
               );

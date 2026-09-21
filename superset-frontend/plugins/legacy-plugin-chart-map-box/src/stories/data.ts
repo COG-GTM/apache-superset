@@ -5526,8 +5526,8 @@ export const generateData = (theme: SupersetTheme) => ({
     ],
   },
   hasCustomMetric: false,
-  mapboxApiKey:
-    'pk.eyJ1Ijoia3Jpc3R3IiwiYSI6ImNqbGg1N242NTFlczczdnBhazViMjgzZ2sifQ.lUneM-o3NucXN189EYyXxQ',
+  // Storybook fixture: supply a real Mapbox token here to render live tiles
+  mapboxApiKey: '',
   mapStyle: 'mapbox://styles/mapbox/light-v9',
   aggregatorName: 'sum',
   clusteringRadius: '60',
