@@ -16,6 +16,7 @@
 # under the License.
 from datetime import datetime
 from typing import Any, Dict
+from urllib.parse import urlparse
 
 from flask import current_app as app, g, redirect, request, Response
 from flask_appbuilder.api import expose, permission_name, safe
@@ -225,6 +226,9 @@ class UserRestApi(BaseSupersetApi):
 
         # Return a permanent redirect to the avatar URL
         if avatar_url:
+            parsed = urlparse(avatar_url)
+            if parsed.scheme not in ("http", "https") or not parsed.netloc:
+                return self.response_404()
             return redirect(avatar_url, code=301)
 
         # No avatar found, return a "no-content" response

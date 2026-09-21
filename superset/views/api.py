@@ -16,6 +16,7 @@
 # under the License.
 from __future__ import annotations
 
+import logging
 from typing import Any, TYPE_CHECKING
 
 from flask import request
@@ -34,11 +35,13 @@ from superset.models.slice import Slice
 from superset.superset_typing import FlaskResponse
 from superset.utils import json
 from superset.utils.date_parser import get_since_until
-from superset.views.base import api, BaseSupersetView
+from superset.views.base import api, BaseSupersetView, json_success
 from superset.views.error_handling import handle_api_exception
 
 if TYPE_CHECKING:
     from superset.common.query_context_factory import QueryContextFactory
+
+logger = logging.getLogger(__name__)
 
 get_time_range_schema = {
     "type": ["string", "array"],
@@ -73,7 +76,9 @@ class Api(BaseSupersetView):
         query_context.raise_for_access()
         result = query_context.get_payload()
         payload_json = result["queries"]
-        return json.dumps(payload_json, default=json.json_int_dttm_ser, ignore_nan=True)
+        return json_success(
+            json.dumps(payload_json, default=json.json_int_dttm_ser, ignore_nan=True)
+        )
 
     @event_logger.log_this
     @api
@@ -123,7 +128,8 @@ class Api(BaseSupersetView):
                 )
             return self.json_response({"result": rv})
         except (ValueError, TimeRangeParseFailError, TimeRangeAmbiguousError) as error:
-            error_msg = {"message": _("Unexpected time range: %(error)s", error=error)}
+            logger.warning("Unexpected time range: %s", error)
+            error_msg = {"message": _("Unexpected time range")}
             return self.json_response(error_msg, 400)
 
     def get_query_context_factory(self) -> QueryContextFactory:

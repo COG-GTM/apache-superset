@@ -35,6 +35,7 @@ else:
 
 from flask import Flask, Response
 from werkzeug.exceptions import NotFound
+from werkzeug.utils import safe_join
 
 from superset.extensions.local_extensions_watcher import (
     start_local_extensions_watcher_thread,
@@ -113,6 +114,8 @@ class SupersetApp(Flask):
         hot-update files that no longer exist. Return 204 instead of 404
         for these files to keep logs clean.
         """
+        if not self.static_folder or safe_join(self.static_folder, filename) is None:
+            raise NotFound()
         if ".hot-update." in filename:
             # First try to serve it normally - it might exist
             try:

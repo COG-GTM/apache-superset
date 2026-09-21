@@ -17,6 +17,7 @@
 
 import argparse
 import os
+import shlex
 import subprocess
 from datetime import datetime
 
@@ -49,38 +50,51 @@ def run_cypress_for_test_file(
 
     for attempt in range(retries):
         # Create Cypress command for a single test file
-        cmd: str = ""
+        cmd: list[str] = []
         if use_dashboard:
             # If/when we want to use cypress' dashboard feature to record the run
             group_id = f"matrix{group}-file{i}-{attempt}"
-            cmd = (
-                f"{XVFB_PRE_CMD} "
-                f'{cypress_cmd} --spec "{test_file}" '
-                f"--config numTestsKeptInMemory=0 "
-                f"--browser {browser} "
-                f"--record --group {group_id} --tag {REPO},{GITHUB_EVENT_NAME} "
-                f"--ci-build-id {build_id} "
-                f"-- {chrome_flags}"
-            )
+            cmd = [
+                *shlex.split(XVFB_PRE_CMD),
+                *shlex.split(cypress_cmd),
+                "--spec",
+                test_file,
+                "--config",
+                "numTestsKeptInMemory=0",
+                "--browser",
+                browser,
+                "--record",
+                "--group",
+                group_id,
+                "--tag",
+                f"{REPO},{GITHUB_EVENT_NAME}",
+                "--ci-build-id",
+                build_id,
+                "--",
+                chrome_flags,
+            ]
         else:
             os.environ.pop("CYPRESS_RECORD_KEY", None)
-            cmd = (
-                f"{XVFB_PRE_CMD} "
-                f"{cypress_cmd} "
-                f"--browser {browser} "
-                f"--config numTestsKeptInMemory=0 "
-                f'--spec "{test_file}" '
-                f"-- {chrome_flags}"
-            )
-            print(f"RUN: {cmd} (Attempt {attempt + 1}/{retries})")
+            cmd = [
+                *shlex.split(XVFB_PRE_CMD),
+                *shlex.split(cypress_cmd),
+                "--browser",
+                browser,
+                "--config",
+                "numTestsKeptInMemory=0",
+                "--spec",
+                test_file,
+                "--",
+                chrome_flags,
+            ]
+            print(f"RUN: {shlex.join(cmd)} (Attempt {attempt + 1}/{retries})")
         if dry_run:
             # Print the command instead of executing it
-            print(f"DRY RUN: {cmd}")
+            print(f"DRY RUN: {shlex.join(cmd)}")
             return 0
 
-        process = subprocess.Popen(  # noqa: S602
+        process = subprocess.Popen(  # noqa: S603
             cmd,
-            shell=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             universal_newlines=True,

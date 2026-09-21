@@ -24,6 +24,7 @@ from flask_appbuilder.api.schemas import get_list_schema
 from flask_appbuilder.security.decorators import permission_name, protect
 from flask_appbuilder.security.sqla.models import RegisterUser, Role
 from flask_wtf.csrf import generate_csrf
+from markupsafe import escape
 from marshmallow import EXCLUDE, fields, post_load, Schema, ValidationError
 from sqlalchemy import asc, desc
 from sqlalchemy.orm import selectinload
@@ -288,7 +289,7 @@ class RoleRestAPI(BaseSupersetApi):
             valid_columns = ["id", "name"]
             if order_column not in valid_columns:
                 return self.response_400(
-                    message=f"Invalid order column: {order_column}"
+                    message=f"Invalid order column: {escape(order_column)}"
                 )
 
             order_by = getattr(Role, order_column)
