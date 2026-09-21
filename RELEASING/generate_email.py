@@ -48,7 +48,10 @@ def render_template(template_file: str, **kwargs: Any) -> str:
     :kwargs: Named parameters to use when rendering the template
     :return: Rendered template
     """
-    template = jinja2.Template(open(template_file).read())
+    env = jinja2.Environment(
+        autoescape=jinja2.select_autoescape(default_for_string=False, default=False)
+    )
+    template = env.from_string(open(template_file).read())
     return template.render(kwargs)
 
 

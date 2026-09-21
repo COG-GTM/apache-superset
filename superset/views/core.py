@@ -42,6 +42,7 @@ from flask_appbuilder.security.decorators import (
     permission_name,
 )
 from flask_babel import gettext as __, lazy_gettext as _
+from markupsafe import escape
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug.utils import safe_join
 
@@ -90,6 +91,7 @@ from superset.utils.core import (
     get_user_id,
     ReservedUrlParameters,
 )
+from superset.utils.link_redirect import is_safe_redirect_url
 from superset.views.base import (
     api,
     BaseSupersetView,
@@ -498,7 +500,12 @@ class Superset(BaseSupersetView):
 
         datasource_name = datasource.name if datasource else _("[Missing Dataset]")
         viz_type = form_data.get("viz_type")
-        if not viz_type and datasource and datasource.default_endpoint:
+        if (
+            not viz_type
+            and datasource
+            and datasource.default_endpoint
+            and is_safe_redirect_url(datasource.default_endpoint)
+        ):
             return redirect(datasource.default_endpoint)
 
         selectedColumns = []  # noqa: N806
@@ -737,7 +744,7 @@ class Superset(BaseSupersetView):
             slices = db.session.query(Slice).filter_by(id=slice_id).all()
             if not slices:
                 return json_error_response(
-                    __("Chart %(id)s not found", id=slice_id), status=404
+                    __("Chart %(id)s not found", id=escape(slice_id)), status=404
                 )
         elif table_name and db_name:
             table = (
@@ -752,8 +759,8 @@ class Superset(BaseSupersetView):
                 return json_error_response(
                     __(
                         "Table %(table)s wasn't found in the database %(db)s",
-                        table=table_name,
-                        db=db_name,
+                        table=escape(table_name),
+                        db=escape(db_name),
                     ),
                     status=404,
                 )
