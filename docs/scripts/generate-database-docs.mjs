@@ -29,6 +29,7 @@
  */
 
 import { spawnSync } from 'child_process';
+import { randomBytes } from 'crypto';
 import fs from 'fs';
 import { createRequire } from 'module';
 import path from 'path';
@@ -68,7 +69,12 @@ with app.app_context():
       encoding: 'utf-8',
       timeout: 60000,
       maxBuffer: 10 * 1024 * 1024,
-      env: { ...process.env, SUPERSET_SECRET_KEY: 'docs-build-key' },
+      env: {
+        ...process.env,
+        // Throwaway key for the docs build only; never used by a running app.
+        SUPERSET_SECRET_KEY:
+          process.env.SUPERSET_SECRET_KEY || randomBytes(32).toString('hex'),
+      },
     });
 
     if (result.error) {

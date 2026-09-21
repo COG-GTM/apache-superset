@@ -181,7 +181,10 @@ Cypress.Commands.add('login', () => {
   cy.request({
     method: 'POST',
     url: '/login/',
-    body: { username: 'admin', password: 'general' },
+    body: {
+      username: Cypress.env('SUPERSET_USERNAME') || 'admin',
+      password: Cypress.env('SUPERSET_PASSWORD') || 'general',
+    },
   }).then(response => {
     if (response.status === 302) {
       // If there's a redirect, follow it manually

@@ -217,7 +217,8 @@ const discardChanges = () => {
   const url = new URL(window.location.href);
 
   url.searchParams.delete('edit');
-  window.location.assign(url);
+  // Only navigate within the current origin (same-origin path + query + hash)
+  window.location.assign(`${url.pathname}${url.search}${url.hash}`);
 };
 
 const Header = (): JSX.Element => {
