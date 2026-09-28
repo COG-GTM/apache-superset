@@ -231,6 +231,19 @@ if (!command || !section || !version) {
   process.exit(1);
 }
 
+const VALID_SECTIONS = ['docs', 'developer_portal', 'components'];
+if (!VALID_SECTIONS.includes(section)) {
+  console.error(`Invalid section: ${section}`);
+  printUsage();
+  process.exit(1);
+}
+
+if (!/^[0-9A-Za-z][0-9A-Za-z.-]*$/.test(version)) {
+  console.error(`Invalid version: ${version}`);
+  printUsage();
+  process.exit(1);
+}
+
 if (command === 'add') {
   addVersion(section, version);
 } else if (command === 'remove') {
