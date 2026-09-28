@@ -130,7 +130,7 @@ charset-normalizer==3.4.2
     # via
     #   -c requirements/base-constraint.txt
     #   requests
-click==8.2.1
+click==8.3.3
     # via
     #   -c requirements/base-constraint.txt
     #   apache-superset
@@ -178,7 +178,7 @@ croniter==6.0.0
     # via
     #   -c requirements/base-constraint.txt
     #   apache-superset
-cryptography==46.0.5
+cryptography==48.0.1
     # via
     #   -c requirements/base-constraint.txt
     #   apache-superset
@@ -503,7 +503,7 @@ limits==5.1.0
     # via
     #   -c requirements/base-constraint.txt
     #   flask-limiter
-mako==1.3.10
+mako==1.3.12
     # via
     #   -c requirements/base-constraint.txt
     #   alembic
@@ -552,7 +552,7 @@ more-itertools==10.8.0
     # via
     #   jaraco-classes
     #   jaraco-functools
-msgpack==1.0.8
+msgpack==1.2.1
     # via
     #   -c requirements/base-constraint.txt
     #   apache-superset
@@ -655,7 +655,7 @@ pgsanity==0.2.9
     # via
     #   -c requirements/base-constraint.txt
     #   apache-superset
-pillow==11.3.0
+pillow==12.1.1
     # via
     #   -c requirements/base-constraint.txt
     #   apache-superset
@@ -716,7 +716,7 @@ pyarrow==16.1.0
     #   apache-superset
     #   db-dtypes
     #   pandas-gbq
-pyasn1==0.6.2
+pyasn1==0.6.3
     # via
     #   -c requirements/base-constraint.txt
     #   pyasn1-modules
@@ -764,7 +764,7 @@ pyhive==0.7.0
     # via apache-superset
 pyinstrument==4.4.0
     # via apache-superset
-pyjwt==2.10.1
+pyjwt==2.12.0
     # via
     #   -c requirements/base-constraint.txt
     #   apache-superset
@@ -778,7 +778,7 @@ pynacl==1.6.2
     # via
     #   -c requirements/base-constraint.txt
     #   paramiko
-pyopenssl==25.3.0
+pyopenssl==26.2.0
     # via
     #   -c requirements/base-constraint.txt
     #   shillelagh
@@ -1055,7 +1055,7 @@ url-normalize==2.2.1
     # via
     #   -c requirements/base-constraint.txt
     #   requests-cache
-urllib3==2.6.3
+urllib3==2.7.0
     # via
     #   -c requirements/base-constraint.txt
     #   botocore
