@@ -18,7 +18,7 @@
 ######################################################################
 # Node stage to deal with static asset construction
 ######################################################################
-ARG PY_VER=3.11.14-slim-trixie
+ARG PY_VER=3.11.17-slim-trixie
 
 # If BUILDPLATFORM is null, set it to 'amd64' (or leave as is otherwise).
 ARG BUILDPLATFORM=${BUILDPLATFORM:-amd64}
@@ -101,6 +101,13 @@ RUN if [ "${BUILD_TRANSLATIONS}" = "true" ]; then \
 # Base python layer
 ######################################################################
 FROM python:${PY_VER} AS python-base
+
+# Pull in Debian security fixes (e.g. openssl, perl, gzip, pcre2, libcap2)
+# that may not yet be included in the upstream base image
+RUN apt-get update -qq \
+    && apt-get upgrade -yqq --no-install-recommends \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* /var/cache/apt/archives/*
 
 ARG SUPERSET_HOME="/app/superset_home"
 ENV SUPERSET_HOME=${SUPERSET_HOME}
