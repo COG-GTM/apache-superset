@@ -124,7 +124,7 @@
   "resolutions": {
     "react-redux": "^9.2.0",
     "@reduxjs/toolkit": "^2.5.0",
-    "baseline-browser-mapping": "^2.9.19",
+    "baseline-browser-mapping": "^2.11.23",
     "@babel/plugin-transform-modules-systemjs": "^7.29.4",
     "axios": "^1.15.0",
     "browserslist": "^4.28.7",
