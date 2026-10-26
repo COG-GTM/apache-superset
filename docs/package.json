@@ -141,7 +141,7 @@
     "serialize-javascript": "^7.0.5",
     "shell-quote": "^1.12.0",
     "websocket-driver": "^0.7.5",
-    "**/@storybook/core/esbuild": "^0.25.12",
+    "**/@storybook/core/esbuild": "^0.28.1",
     "**/@storybook/core/ws": "^8.21.0",
     "**/webpack-dev-server/ws": "^8.21.0",
     "**/sass/immutable": "^5.1.5",
