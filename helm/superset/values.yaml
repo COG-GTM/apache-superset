@@ -320,7 +320,6 @@ supersetNode:
           memory: "128Mi"
       securityContext:
         allowPrivilegeEscalation: false
-        runAsNonRoot: true
         capabilities:
           drop:
             - ALL
@@ -437,7 +436,6 @@ supersetWorker:
           memory: "128Mi"
       securityContext:
         allowPrivilegeEscalation: false
-        runAsNonRoot: true
         capabilities:
           drop:
             - ALL
@@ -538,7 +536,6 @@ supersetCeleryBeat:
           memory: "128Mi"
       securityContext:
         allowPrivilegeEscalation: false
-        runAsNonRoot: true
         capabilities:
           drop:
             - ALL
@@ -650,7 +647,6 @@ supersetCeleryFlower:
           memory: "128Mi"
       securityContext:
         allowPrivilegeEscalation: false
-        runAsNonRoot: true
         capabilities:
           drop:
             - ALL
@@ -839,7 +835,6 @@ init:
           memory: "128Mi"
       securityContext:
         allowPrivilegeEscalation: false
-        runAsNonRoot: true
         capabilities:
           drop:
             - ALL
