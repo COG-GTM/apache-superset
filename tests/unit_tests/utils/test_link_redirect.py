@@ -132,6 +132,12 @@ def test_unsafe_protocol_relative(app: Flask) -> None:
     assert not is_safe_redirect_url("//evil.com/x")
 
 
+def test_unsafe_backslash_protocol_relative(app: Flask) -> None:
+    assert not is_safe_redirect_url("\\\\evil.com/x")
+    assert not is_safe_redirect_url("/\\evil.com/x")
+    assert not is_safe_redirect_url("\\/evil.com/x")
+
+
 def test_unsafe_empty(app: Flask) -> None:
     assert not is_safe_redirect_url("")
     assert not is_safe_redirect_url("   ")

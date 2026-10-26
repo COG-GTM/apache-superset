@@ -126,10 +126,11 @@ def is_safe_redirect_url(url: str) -> bool:
     if not url or not url.strip():
         return False
 
-    stripped = url.strip()
+    # Browsers treat backslashes as forward slashes, so normalize before checking
+    stripped = url.strip().replace("\\", "/")
 
     # Block protocol-relative URLs
-    if stripped.startswith("//") or stripped.startswith("\\\\"):
+    if stripped.startswith("//"):
         return False
 
     parsed = urlparse(stripped)
