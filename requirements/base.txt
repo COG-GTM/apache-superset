@@ -99,7 +99,8 @@ deprecated==1.2.18
     # via limits
 deprecation==2.1.0
     # via apache-superset (pyproject.toml)
-dnspython==2.9.0
+dnspython==2.9.0 ; python_version >= "3.11"
+dnspython==2.8.0 ; python_version < "3.11"
     # via email-validator
 email-validator==2.2.0
     # via flask-appbuilder
@@ -215,7 +216,8 @@ mako==1.4.3
     #   -r requirements/base.in
     #   apache-superset (pyproject.toml)
     #   alembic
-markdown==3.11
+markdown==3.11 ; python_version >= "3.11"
+markdown==3.10.2 ; python_version < "3.11"
     # via
     #   -r requirements/base.in
     #   apache-superset (pyproject.toml)
@@ -289,7 +291,8 @@ parsedatetime==2.6
     # via apache-superset (pyproject.toml)
 pgsanity==0.2.9
     # via apache-superset (pyproject.toml)
-pillow==13.0.0
+pillow==13.0.0 ; python_version >= "3.11"
+pillow==12.3.0 ; python_version < "3.11"
     # via
     #   -r requirements/base.in
     #   apache-superset (pyproject.toml)

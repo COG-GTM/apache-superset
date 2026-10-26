@@ -209,7 +209,8 @@ dill==0.4.0
     # via pylint
 distlib==0.3.8
     # via virtualenv
-dnspython==2.9.0
+dnspython==2.9.0 ; python_version >= "3.11"
+dnspython==2.8.0 ; python_version < "3.11"
     # via
     #   -c requirements/base-constraint.txt
     #   email-validator
@@ -508,7 +509,8 @@ mako==1.4.3
     #   -c requirements/base-constraint.txt
     #   alembic
     #   apache-superset
-markdown==3.11
+markdown==3.11 ; python_version >= "3.11"
+markdown==3.10.2 ; python_version < "3.11"
     # via
     #   -c requirements/base-constraint.txt
     #   apache-superset
@@ -655,7 +657,8 @@ pgsanity==0.2.9
     # via
     #   -c requirements/base-constraint.txt
     #   apache-superset
-pillow==13.0.0
+pillow==13.0.0 ; python_version >= "3.11"
+pillow==12.3.0 ; python_version < "3.11"
     # via
     #   -c requirements/base-constraint.txt
     #   apache-superset

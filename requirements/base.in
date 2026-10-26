@@ -21,14 +21,16 @@ urllib3>=2.8.0,<3.0.0
 # Security: minimum patched versions for Snyk-reported vulnerabilities
 cryptography>=50.0.0
 pyjwt>=2.15.0
-pillow>=13.0.0
+pillow>=13.0.0; python_version >= "3.11"
+pillow>=12.3.0; python_version < "3.11"
 pyopenssl>=26.0.0
 mako>=1.4.2
 click>=8.3.3
 msgpack>=1.2.1
 pyasn1>=0.6.4
 certifi>=2026.10.19
-dnspython>=2.9.0
+dnspython>=2.9.0; python_version >= "3.11"
+dnspython>=2.8.0; python_version < "3.11"
 # Security: CVE-2026-27199 - Windows device name handling in safe_join
 werkzeug>=3.1.9,<4.0.0
 geopy>=2.5.0
