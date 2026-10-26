@@ -32,7 +32,7 @@ const CONFIG_FILE = path.join(__dirname, '..', 'versions-config.json');
 // Parse command line arguments
 const args = process.argv.slice(2);
 const command = args[0]; // 'add' or 'remove'
-const section = args[1]; // 'docs', 'developer_portal', or 'components'
+const section = args[1]; // a top-level key of versions-config.json
 const version = args[2]; // version string like '1.2.0'
 
 function loadConfig() {
@@ -215,7 +215,7 @@ Usage:
   node scripts/manage-versions.js remove <section> <version>
 
 Where:
-  - section: 'docs', 'developer_portal', or 'components'
+  - section: a top-level key of versions-config.json (e.g. 'docs', 'admin_docs', 'developer_docs', 'components')
   - version: version string (e.g., '1.2.0', '2.0.0')
 
 Examples:
@@ -227,6 +227,19 @@ Examples:
 
 // Main execution
 if (!command || !section || !version) {
+  printUsage();
+  process.exit(1);
+}
+
+const VALID_SECTIONS = Object.keys(loadConfig());
+if (!VALID_SECTIONS.includes(section)) {
+  console.error(`Invalid section: ${section}`);
+  printUsage();
+  process.exit(1);
+}
+
+if (!/^[0-9A-Za-z][0-9A-Za-z.-]*$/.test(version)) {
+  console.error(`Invalid version: ${version}`);
   printUsage();
   process.exit(1);
 }
