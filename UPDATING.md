@@ -24,6 +24,10 @@ assists people when migrating to a new version.
 
 ## Next
 
+### Helm chart runs Superset as a non-root user by default
+
+The Helm chart (0.16.0) changes the default `runAsUser` from `0` to `1000` (the `superset` user in the official image) and sets `runAsNonRoot: true`, `allowPrivilegeEscalation: false` and `capabilities.drop: [ALL]` in the `podSecurityContext`/`containerSecurityContext` of the Superset node, worker, beat, flower and init components. Bootstrap scripts that need root (e.g. `uv pip install` of database drivers into `/app/.venv` or `apt-get install`) will fail under the new defaults. Move those installs into a custom image, or restore the previous behaviour by setting `runAsUser: 0` and `runAsNonRoot: false` in each component's `podSecurityContext` and `containerSecurityContext`.
+
 ### Deck.gl MapBox viewport and opacity controls are functional
 
 The Deck.gl MapBox chart's **Opacity**, **Default longitude**, **Default latitude**, and **Zoom** controls were previously non-functional — changing them had no effect on the rendered map. These controls are now wired up correctly.
