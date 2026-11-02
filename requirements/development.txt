@@ -88,7 +88,7 @@ bottleneck==1.5.0
     # via
     #   -c requirements/base-constraint.txt
     #   apache-superset
-brotli==1.2.0
+brotli==1.2.1
     # via
     #   -c requirements/base-constraint.txt
     #   flask-compress
@@ -719,7 +719,7 @@ pyarrow==16.1.0
     #   apache-superset
     #   db-dtypes
     #   pandas-gbq
-pyasn1==0.6.4
+pyasn1==0.6.5
     # via
     #   -c requirements/base-constraint.txt
     #   pyasn1-modules

@@ -36,7 +36,7 @@ blinker==1.9.0
     # via flask
 bottleneck==1.5.0
     # via apache-superset (pyproject.toml)
-brotli==1.2.0
+brotli==1.2.1
     # via
     #   -r requirements/base.in
     #   flask-compress
@@ -308,7 +308,7 @@ prompt-toolkit==3.0.51
     # via click-repl
 pyarrow==16.1.0
     # via apache-superset (pyproject.toml)
-pyasn1==0.6.4
+pyasn1==0.6.5
     # via
     #   -r requirements/base.in
     #   pyasn1-modules
