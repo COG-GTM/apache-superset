@@ -158,6 +158,10 @@ instead of hard-coding them in your bootstrap script, as seen below.
 
 The following example installs the drivers for BigQuery and Elasticsearch, allowing you to connect to these data sources within your Superset setup:
 
+:::note
+The chart runs Superset as the non-root `superset` user (`runAsUser: 1000`) by default, which cannot write to the image's `/app/.venv`. Either build a custom image that installs the drivers (recommended), or run the bootstrap script as root by setting `runAsUser: 0` and `runAsNonRoot: false` in the `podSecurityContext` and `containerSecurityContext` of every Superset component (`supersetNode`, `supersetWorker`, `supersetCeleryBeat`, `supersetCeleryFlower`, `init`).
+:::
+
 ```yaml
 bootstrapScript: |
   #!/bin/bash
