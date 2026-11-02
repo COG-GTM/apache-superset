@@ -36,6 +36,9 @@
   "overrides": {
     "cypress": {
       "form-data": "^2.3.4"
+    },
+    "@cypress/code-coverage": {
+      "js-yaml": "^4.3.2"
     }
   }
 }
