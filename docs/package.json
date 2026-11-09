@@ -192,7 +192,8 @@
     "**/micromatch/picomatch": "^2.3.2",
     "**/jest-util/picomatch": "^2.3.2",
     "**/@parcel/watcher/picomatch": "^4.0.4",
-    "**/tinyglobby/picomatch": "^4.0.4"
+    "**/tinyglobby/picomatch": "^4.0.4",
+    "**/webpack-dev-server/open": "^11.0.4"
   },
   "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }
