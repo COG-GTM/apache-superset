@@ -468,7 +468,7 @@ jmespath==1.1.0
     # via
     #   boto3
     #   botocore
-jsonpath-ng==1.7.0
+jsonpath-ng==1.9.0
     # via
     #   -c requirements/base-constraint.txt
     #   apache-superset
@@ -674,10 +674,6 @@ platformdirs==4.3.8
     #   virtualenv
 pluggy==1.5.0
     # via pytest
-ply==3.11
-    # via
-    #   -c requirements/base-constraint.txt
-    #   jsonpath-ng
 polyline==2.0.2
     # via
     #   -c requirements/base-constraint.txt
