@@ -76,6 +76,7 @@ from superset.utils.core import (
     QueryStatus,
     user_label,
 )
+from superset.utils.dates import utcnow
 
 if TYPE_CHECKING:
     from superset.connectors.sqla.models import TableColumn
@@ -155,9 +156,7 @@ class Query(
     end_result_backend_time = Column(Numeric(precision=20, scale=6))
     tracking_url_raw = Column(Text, name="tracking_url")
 
-    changed_on = Column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=True
-    )
+    changed_on = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=True)
 
     database = relationship(
         "Database",

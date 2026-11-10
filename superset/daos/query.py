@@ -15,7 +15,6 @@
 # specific language governing permissions and limitations
 # under the License.
 import logging
-from datetime import datetime
 from typing import Any, Union
 
 from superset import sql_lab
@@ -27,7 +26,7 @@ from superset.models.sql_lab import Query, SavedQuery
 from superset.queries.filters import QueryFilter
 from superset.queries.saved_queries.filters import SavedQueryFilter
 from superset.utils.core import get_user_id
-from superset.utils.dates import now_as_float
+from superset.utils.dates import now_as_float, utcfromtimestamp
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +47,7 @@ class QueryDAO(BaseDAO[Query]):
     @staticmethod
     def get_queries_changed_after(last_updated_ms: Union[float, int]) -> list[Query]:
         # UTC date time, same that is stored in the DB.
-        last_updated_dt = datetime.utcfromtimestamp(last_updated_ms / 1000)
+        last_updated_dt = utcfromtimestamp(last_updated_ms / 1000)
 
         return (
             db.session.query(Query)
