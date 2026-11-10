@@ -24,6 +24,13 @@ assists people when migrating to a new version.
 
 ## Next
 
+### Python 3.12 is now the minimum supported version
+
+Superset (and `apache-superset-core` / `apache-superset-extensions-cli`) now require Python 3.12 (`requires-python = ">=3.12"`); Python 3.10 and 3.11 are no longer supported. The default Docker base image is `python:3.12-slim-trixie` and CI runs on Python 3.12 only. Related changes:
+- The `oracle` extra requires `cx-Oracle>=8.3.0,<8.4` (older releases do not import on 3.12). `cx-Oracle` 8.3.0 ships no 3.12 wheels, so it is built from source and needs `setuptools<81` at build time, e.g. `echo "setuptools<81" > c.txt && PIP_BUILD_CONSTRAINT=c.txt pip install "apache-superset[oracle]"` (or `uv pip install --build-constraint c.txt ...`).
+- The `mssql` extra requires `pymssql>=2.2.9` (first release with Python 3.12 wheels).
+- The `pyhive[hive]` (SASL C extension) dependency that was gated on `python_version<'3.11'` has been removed from the `hive`/`spark` extras; `pyhive[hive_pure_sasl]` is used instead.
+
 ### Deck.gl MapBox viewport and opacity controls are functional
 
 The Deck.gl MapBox chart's **Opacity**, **Default longitude**, **Default latitude**, and **Zoom** controls were previously non-functional — changing them had no effect on the rendered map. These controls are now wired up correctly.

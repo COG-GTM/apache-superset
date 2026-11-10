@@ -435,8 +435,8 @@ graph TB
 # Ubuntu/Debian
 apt-get update
 apt-get install -y \
-    python3.11 \
-    python3.11-dev \
+    python3.12 \
+    python3.12-dev \
     python3-pip \
     build-essential \
     libssl-dev \
@@ -446,8 +446,8 @@ apt-get install -y \
 
 # RHEL/CentOS
 yum install -y \
-    python311 \
-    python311-devel \
+    python312 \
+    python312-devel \
     gcc \
     gcc-c++ \
     openssl-devel \
@@ -458,7 +458,7 @@ yum install -y \
 
 ```bash
 # Create virtual environment
-python3.11 -m venv /opt/superset/venv
+python3.12 -m venv /opt/superset/venv
 source /opt/superset/venv/bin/activate
 
 # Install Superset with MCP support

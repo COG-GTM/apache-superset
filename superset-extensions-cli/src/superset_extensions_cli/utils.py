@@ -17,7 +17,7 @@
 
 import json  # noqa: TID251
 import re
-import sys
+import tomllib
 from pathlib import Path
 from typing import Any
 
@@ -31,10 +31,6 @@ from superset_core.extensions.constants import (
 from superset_extensions_cli.exceptions import ExtensionNameError
 from superset_extensions_cli.types import ExtensionNames
 
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
 
 # Python reserved keywords to avoid in package names
 PYTHON_KEYWORDS = {

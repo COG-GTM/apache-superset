@@ -186,7 +186,7 @@ jobs:
             --preset ci \
             --platform  linux/amd64 \
             --context-ref "$RELEASE" \
-            --extra-flags "--build-arg INCLUDE_CHROMIUM=false"
+            --extra-flags "--build-arg INCLUDE_CHROMIUM=false --build-arg PY_VER=3.12-slim-trixie"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v6

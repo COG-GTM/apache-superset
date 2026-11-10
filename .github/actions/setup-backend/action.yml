@@ -26,12 +26,10 @@ runs:
       shell: bash
       run: |
         if [ "${{ inputs.python-version }}" = "current" ]; then
-          echo "PYTHON_VERSION=3.11" >> $GITHUB_ENV
-        elif [ "${{ inputs.python-version }}" = "next" ]; then
-          # currently disabled in GHA matrixes because of library compatibility issues
           echo "PYTHON_VERSION=3.12" >> $GITHUB_ENV
-        elif [ "${{ inputs.python-version }}" = "previous" ]; then
-          echo "PYTHON_VERSION=3.10" >> $GITHUB_ENV
+        elif [ "${{ inputs.python-version }}" = "next" ]; then
+          # not part of GHA matrixes until library compatibility is confirmed
+          echo "PYTHON_VERSION=3.13" >> $GITHUB_ENV
         else
           echo "PYTHON_VERSION=${{ inputs.python-version }}" >> $GITHUB_ENV
         fi

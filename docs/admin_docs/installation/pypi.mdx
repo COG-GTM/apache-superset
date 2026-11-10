@@ -26,7 +26,7 @@ Ubuntu **24.04** uses python 3.12 per default, which currently is not supported 
 ```bash
 sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt update
-sudo apt install python3.11 python3.11-dev python3.11-venv build-essential libssl-dev libffi-dev libsasl2-dev libldap2-dev default-libmysqlclient-dev
+sudo apt install python3.12 python3.12-dev python3.12-venv build-essential libssl-dev libffi-dev libsasl2-dev libldap2-dev default-libmysqlclient-dev
 ```
 
 In Ubuntu **20.04 and 22.04** the following command will ensure that the required dependencies are installed:
@@ -103,7 +103,7 @@ These will now be available when pip installing requirements.
 
 We highly recommend installing Superset inside of a virtual environment.
 
-You can create and activate a virtual environment using the following commands. Ensure you are using a compatible version of python. You might have to explicitly use for example `python3.11` instead of `python3`.
+You can create and activate a virtual environment using the following commands. Ensure you are using a compatible version of python. You might have to explicitly use for example `python3.12` instead of `python3`.
 
 ```bash
 # virtualenv is shipped in Python 3.6+ as venv instead of pyvenv.

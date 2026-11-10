@@ -27,7 +27,6 @@ import textwrap
 from ast import literal_eval
 from contextlib import closing, contextmanager, nullcontext, suppress
 from copy import deepcopy
-from datetime import datetime
 from functools import lru_cache
 from inspect import signature
 from typing import Any, Callable, cast, Optional, TYPE_CHECKING
@@ -85,6 +84,7 @@ from superset.superset_typing import (
 from superset.utils import cache as cache_util, core as utils, json
 from superset.utils.backports import StrEnum
 from superset.utils.core import get_query_source_from_request, get_username
+from superset.utils.dates import utcnow
 from superset.utils.oauth2 import (
     check_for_oauth2,
     get_oauth2_access_token,
@@ -1374,7 +1374,7 @@ class Log(Model):  # pylint: disable=too-few-public-methods
     user = relationship(
         security_manager.user_model, backref="logs", foreign_keys=[user_id]
     )
-    dttm = Column(DateTime, default=datetime.utcnow)
+    dttm = Column(DateTime, default=utcnow)
     duration_ms = Column(Integer)
     referrer = Column(String(1024))
 
@@ -1391,4 +1391,4 @@ class FavStar(UUIDMixin, Model):
     user_id = Column(Integer, ForeignKey("ab_user.id"))
     class_name = Column(String(50))
     obj_id = Column(Integer)
-    dttm = Column(DateTime, default=datetime.utcnow)
+    dttm = Column(DateTime, default=utcnow)

@@ -22,7 +22,7 @@ jobs:
     steps:
       - id: set_matrix
         run: |
-          MATRIX_CONFIG=$(if [ "${{ github.event_name }}" == "pull_request" ]; then echo '["dev", "lean"]'; else echo '["dev", "lean", "py310", "websocket", "dockerize", "py311", "py312"]'; fi)
+          MATRIX_CONFIG=$(if [ "${{ github.event_name }}" == "pull_request" ]; then echo '["dev", "lean"]'; else echo '["dev", "lean", "websocket", "dockerize", "py312"]'; fi)
           echo "matrix_config=${MATRIX_CONFIG}" >> $GITHUB_OUTPUT
           echo $GITHUB_OUTPUT
 
@@ -85,7 +85,7 @@ jobs:
             --preset ${{ matrix.build_preset }} \
             --context "$EVENT" \
             --context-ref "$RELEASE" $FORCE_LATEST \
-            --extra-flags "--build-arg INCLUDE_CHROMIUM=false --tag $IMAGE_TAG" \
+            --extra-flags "--build-arg INCLUDE_CHROMIUM=false --build-arg PY_VER=3.12-slim-trixie --tag $IMAGE_TAG" \
             $PLATFORM_ARG
 
       # in the context of push (using multi-platform build), we need to pull the image locally

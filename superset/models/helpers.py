@@ -118,7 +118,7 @@ from superset.utils.core import (
     TIME_COMPARISON,
 )
 from superset.utils.date_parser import get_past_or_future, normalize_time_delta
-from superset.utils.dates import datetime_to_epoch
+from superset.utils.dates import datetime_to_epoch, utcfromtimestamp
 from superset.utils.rls import apply_rls
 
 
@@ -2156,7 +2156,7 @@ class ExploreMixin:  # pylint: disable=too-many-public-methods
             ):
                 value = db_engine_spec.convert_dttm(
                     target_type=target_native_type,
-                    dttm=datetime.utcfromtimestamp(value / 1000),
+                    dttm=utcfromtimestamp(value / 1000),
                     db_extra=db_extra,
                 )
                 value = literal_column(value)
