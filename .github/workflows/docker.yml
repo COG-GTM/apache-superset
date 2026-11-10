@@ -85,7 +85,7 @@ jobs:
             --preset ${{ matrix.build_preset }} \
             --context "$EVENT" \
             --context-ref "$RELEASE" $FORCE_LATEST \
-            --extra-flags "--build-arg INCLUDE_CHROMIUM=false --tag $IMAGE_TAG" \
+            --extra-flags "--build-arg INCLUDE_CHROMIUM=false --build-arg PY_VER=3.12-slim-trixie --tag $IMAGE_TAG" \
             $PLATFORM_ARG
 
       # in the context of push (using multi-platform build), we need to pull the image locally
