@@ -15,10 +15,17 @@
 # specific language governing permissions and limitations
 # under the License.
 
-from unittest.mock import MagicMock
+from collections.abc import Iterator
+from typing import Any
+from unittest.mock import MagicMock, PropertyMock
 
 import pytest
+from flask import g
+from pytest_mock import MockerFixture
+from sqlalchemy import inspect
+from sqlalchemy.orm.session import Session
 
+from superset.app import SupersetApp
 from superset.dashboards.schemas import DashboardGetResponseSchema
 
 
@@ -97,3 +104,93 @@ def test_data_key_mapping_logic() -> None:
     # fields without data_key map to themselves
     assert key_to_name["id"] == "id"
     assert key_to_name["thumbnail_url"] == "thumbnail_url"
+
+
+@pytest.fixture
+def session_with_dashboards(
+    session: Session, mocker: MockerFixture
+) -> Iterator[Session]:
+    from superset.connectors.sqla.models import SqlaTable
+    from superset.models.core import Database
+    from superset.models.dashboard import Dashboard
+    from superset.models.slice import Slice
+
+    engine = session.get_bind()
+    Dashboard.metadata.create_all(engine)  # pylint: disable=no-member
+
+    database = Database(database_name="db", sqlalchemy_uri="sqlite://")
+    table = SqlaTable(table_name="t", database=database)
+    for i in range(1, 4):
+        chart = Slice(
+            slice_name=f"chart {i}",
+            datasource_type="table",
+            table=table,
+        )
+        session.add(
+            Dashboard(
+                dashboard_title=f"dashboard {i}",
+                position_json="{}",
+                css="",
+                json_metadata="{}",
+                slices=[chart],
+            )
+        )
+    session.commit()
+    session.expunge_all()
+    mocker.patch(
+        "flask_appbuilder.models.sqla.interface.SQLAInterface.session",
+        new_callable=PropertyMock,
+        return_value=session,
+    )
+    yield session
+    session.rollback()
+
+
+def _unloaded_digest_inputs(dashboard: Any) -> set[str]:
+    return inspect(dashboard).unloaded & {
+        "position_json",
+        "css",
+        "json_metadata",
+        "slices",
+    }
+
+
+def test_list_query_prefetches_thumbnail_digest_inputs(
+    session_with_dashboards: Session,
+    app: SupersetApp,
+) -> None:
+    """The list query batch-loads what the thumbnail digest reads."""
+    from superset.dashboards.api import DashboardRestApi
+
+    with app.test_request_context():
+        count, dashboards = DashboardRestApi.datamodel.query(
+            select_columns=["id", "thumbnail_url"]
+        )
+
+    assert count == 3
+    for dashboard in dashboards:
+        assert _unloaded_digest_inputs(dashboard) == set()
+        assert "table" not in inspect(dashboard.slices[0]).unloaded
+
+
+def test_list_query_skips_prefetch_without_thumbnail_url(
+    session_with_dashboards: Session,
+    app: SupersetApp,
+) -> None:
+    """No extra queries when the response omits ``thumbnail_url``."""
+    from superset.dashboards.api import (
+        DashboardRestApi,
+        PREFETCH_THUMBNAIL_INPUTS_KEY,
+    )
+
+    with app.test_request_context():
+        _, dashboards = DashboardRestApi.datamodel.query(
+            select_columns=["id", "dashboard_title"]
+        )
+        assert all(_unloaded_digest_inputs(d) for d in dashboards)
+
+        setattr(g, PREFETCH_THUMBNAIL_INPUTS_KEY, False)
+        _, dashboards = DashboardRestApi.datamodel.query(
+            select_columns=["id", "thumbnail_url"]
+        )
+        assert all(_unloaded_digest_inputs(d) for d in dashboards)

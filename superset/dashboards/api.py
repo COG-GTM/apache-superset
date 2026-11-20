@@ -32,10 +32,13 @@ from flask_appbuilder.const import (
     API_LIST_COLUMNS_RIS_KEY,
     API_LIST_TITLE_RIS_KEY,
     API_ORDER_COLUMNS_RIS_KEY,
+    API_SELECT_COLUMNS_RIS_KEY,
 )
+from flask_appbuilder.models.filters import Filters
 from flask_appbuilder.models.sqla.interface import SQLAInterface
 from flask_babel import gettext, ngettext
 from marshmallow import ValidationError
+from sqlalchemy.orm import selectinload, undefer
 from werkzeug.wrappers import Response as WerkzeugResponse
 from werkzeug.wsgi import FileWrapper
 
@@ -117,6 +120,7 @@ from superset.exceptions import ScreenshotImageNotAvailableException
 from superset.extensions import event_logger
 from superset.models.dashboard import Dashboard
 from superset.models.embedded_dashboard import EmbeddedDashboard
+from superset.models.slice import Slice
 from superset.security.guest_token import GuestUser
 from superset.tasks.thumbnails import (
     cache_dashboard_screenshot,
@@ -173,6 +177,55 @@ def with_dashboard(
     return functools.update_wrapper(wraps, f)
 
 
+PREFETCH_THUMBNAIL_INPUTS_KEY = "dashboard_list_prefetch_thumbnail_inputs"
+
+
+class DashboardSQLAInterface(SQLAInterface):
+    """
+    Batch-loads what ``Dashboard.thumbnail_url`` reads when it is listed.
+
+    The thumbnail digest reads the deferred ``position_json``, ``css`` and
+    ``json_metadata`` columns and each chart's dataset. Without this, every
+    dashboard on a list page loads them with separate lazy queries.
+    """
+
+    def query(
+        self,
+        filters: Filters | None = None,
+        order_column: str = "",
+        order_direction: str = "",
+        page: int | None = None,
+        page_size: int | None = None,
+        select_columns: list[str] | None = None,
+        outer_default_load: bool = False,
+    ) -> tuple[int, list[Dashboard]]:
+        """Run the list query, then batch-load the thumbnail digest inputs."""
+        count, dashboards = super().query(
+            filters,
+            order_column,
+            order_direction,
+            page,
+            page_size,
+            select_columns,
+            outer_default_load,
+        )
+        if (
+            dashboards
+            and select_columns
+            and "thumbnail_url" in select_columns
+            and g.get(PREFETCH_THUMBNAIL_INPUTS_KEY, True)
+        ):
+            db.session.query(Dashboard).filter(
+                Dashboard.id.in_([dashboard.id for dashboard in dashboards])
+            ).options(
+                undefer(Dashboard.position_json),
+                undefer(Dashboard.css),
+                undefer(Dashboard.json_metadata),
+                selectinload(Dashboard.slices).selectinload(Slice.table),
+            ).all()
+        return count, dashboards
+
+
 # Base columns (everything except tags)
 BASE_LIST_COLUMNS = [
     "id",
@@ -222,7 +275,7 @@ CUSTOM_TAG_LIST_COLUMNS = BASE_LIST_COLUMNS + [
 
 # pylint: disable=too-many-public-methods
 class DashboardRestApi(CustomTagsOptimizationMixin, BaseSupersetModelRestApi):
-    datamodel = SQLAInterface(Dashboard)
+    datamodel = DashboardSQLAInterface(Dashboard)
 
     include_route_methods = RouteMethod.REST_MODEL_VIEW_CRUD_SET | {
         RouteMethod.EXPORT,
@@ -330,6 +383,16 @@ class DashboardRestApi(CustomTagsOptimizationMixin, BaseSupersetModelRestApi):
               $ref: '#/components/responses/500'
         """
         return super().get_list(**kwargs)
+
+    def get_list_headless(self, **kwargs: Any) -> Response:
+        """Skip the thumbnail prefetch when the response omits ``thumbnail_url``."""
+        columns = kwargs.get("rison", {}).get(API_SELECT_COLUMNS_RIS_KEY)
+        setattr(
+            g,
+            PREFETCH_THUMBNAIL_INPUTS_KEY,
+            not columns or "thumbnail_url" in columns,
+        )
+        return super().get_list_headless(**kwargs)
 
     list_select_columns = list_columns + ["changed_on", "created_on", "changed_by_fk"]
     order_columns = [
