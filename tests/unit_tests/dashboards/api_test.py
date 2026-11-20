@@ -110,6 +110,7 @@ def test_data_key_mapping_logic() -> None:
 def session_with_dashboards(
     session: Session, mocker: MockerFixture
 ) -> Iterator[Session]:
+    """Three dashboards, each with one chart on a shared dataset."""
     from superset.connectors.sqla.models import SqlaTable
     from superset.models.core import Database
     from superset.models.dashboard import Dashboard
@@ -147,6 +148,7 @@ def session_with_dashboards(
 
 
 def _unloaded_digest_inputs(dashboard: Any) -> set[str]:
+    """Return the thumbnail digest inputs not yet loaded on ``dashboard``."""
     return inspect(dashboard).unloaded & {
         "position_json",
         "css",
@@ -194,3 +196,21 @@ def test_list_query_skips_prefetch_without_thumbnail_url(
             select_columns=["id", "thumbnail_url"]
         )
         assert all(_unloaded_digest_inputs(d) for d in dashboards)
+
+
+def test_list_query_skips_prefetch_with_custom_digest_func(
+    session_with_dashboards: Session,
+    app: SupersetApp,
+    mocker: MockerFixture,
+) -> None:
+    """A custom digest function may not read the default inputs."""
+    from superset.dashboards.api import DashboardRestApi
+
+    mocker.patch.dict(
+        app.config, {"THUMBNAIL_DASHBOARD_DIGEST_FUNC": lambda *args: "digest"}
+    )
+    with app.test_request_context():
+        _, dashboards = DashboardRestApi.datamodel.query(
+            select_columns=["id", "thumbnail_url"]
+        )
+    assert all(_unloaded_digest_inputs(d) for d in dashboards)

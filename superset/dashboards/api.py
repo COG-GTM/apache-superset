@@ -184,9 +184,10 @@ class DashboardSQLAInterface(SQLAInterface):
     """
     Batch-loads what ``Dashboard.thumbnail_url`` reads when it is listed.
 
-    The thumbnail digest reads the deferred ``position_json``, ``css`` and
-    ``json_metadata`` columns and each chart's dataset. Without this, every
-    dashboard on a list page loads them with separate lazy queries.
+    The default thumbnail digest reads the deferred ``position_json``, ``css``
+    and ``json_metadata`` columns and each chart's dataset. Without this, every
+    dashboard on a list page loads them with separate lazy queries. A custom
+    ``THUMBNAIL_DASHBOARD_DIGEST_FUNC`` may not read them, so it is skipped then.
     """
 
     def query(
@@ -214,6 +215,7 @@ class DashboardSQLAInterface(SQLAInterface):
             and select_columns
             and "thumbnail_url" in select_columns
             and g.get(PREFETCH_THUMBNAIL_INPUTS_KEY, True)
+            and not current_app.config["THUMBNAIL_DASHBOARD_DIGEST_FUNC"]
         ):
             db.session.query(Dashboard).filter(
                 Dashboard.id.in_([dashboard.id for dashboard in dashboards])
